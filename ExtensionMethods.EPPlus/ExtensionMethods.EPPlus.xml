@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ExtensionMethods.EPPlus</name>
+    </assembly>
+    <members>
+        <member name="T:ExtensionMethods.EPPlus.DataTableExtension">
+            <summary>
+            EPPLUS扩展
+            </summary>
+        </member>
+        <member name="M:ExtensionMethods.EPPlus.DataTableExtension.ToExcel(System.Data.DataTable,OfficeOpenXml.ExcelPackage@,System.String)">
+            <summary>
+            将表数据导出至Excel中,第一行为列名
+            </summary>
+            <param name="dataTable"></param>
+            <param name="excelPackage">要导出的Excel文件</param>
+            <param name="SheetName">表名,如为空则使用DataTable.TableName,如有分页会在表名后加"-Page1..N"</param>
+            <returns>页数</returns>
+        </member>
+        <member name="T:ExtensionMethods.EPPlus.ExcelWorksheetExtension">
+            <summary>
+            EPPLUS扩展
+            </summary>
+        </member>
+        <member name="M:ExtensionMethods.EPPlus.ExcelWorksheetExtension.ToDataTable(OfficeOpenXml.ExcelWorksheet,System.Boolean)">
+            <summary>
+            转换为datatable,区域为左上到右下
+            </summary>
+            <param name="worksheet"></param>
+            <param name="firstIsHead">第一行是否当作列名</param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

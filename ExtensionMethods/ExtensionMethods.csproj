@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
+    <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
+    <Authors>AISY</Authors>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Description>
+      集合了部分常用扩展函数
+      最小依赖项
+      减少 using 方便直接源代码复制使用或者测试
+      100%包含注释
+      测试覆盖率 60%
+      方便写程序的同时兼顾性能
+    </Description>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\Output\</OutputPath>
+    <DocumentationFile>..\Output\ExtensionMethods.xml</DocumentationFile>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework)=='netcoreapp3.1'">
+  </ItemGroup>
+  <ItemGroup Condition="$(TargetFramework)=='net5.0'">
+  </ItemGroup>
+
+</Project>
