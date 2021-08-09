@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Authors>AISY</Authors>
+    <Authors>AiSY-Yang</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>集合了EPPlus相关的扩展函数</Description>
@@ -12,6 +12,9 @@
   <PropertyGroup>
     <OutputPath>..\Output\</OutputPath>
     <DocumentationFile>..\Output\ExtensionMethods.EPPlus.xml</DocumentationFile>
+    <RepositoryUrl>https://github.com/AiSY-Yang/ExtensionMethods</RepositoryUrl>
+    <PackageId>AiSY-Yang.ExtensionMethods.EPPlus</PackageId>
+    <Company>AiSY-Yang</Company>
   </PropertyGroup>
 
   <ItemGroup>

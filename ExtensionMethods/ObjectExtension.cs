@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 #if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
 using System.Text.Json;
 #endif
@@ -162,15 +163,21 @@ namespace ExtensionMethods
 				{
 					item.SetValue(obj, item.GetValue(obj) switch
 					{
-						string => DateTime.TryParse(dataRow[item.Name].ToString(), out DateTime date) ? date.ToString("yyyy-MM-dd HH:mm:ss") : dataRow[item.Name].ToString(),
-						double => double.Parse(dataRow[item.Name].ToString()),
-						float => float.Parse(dataRow[item.Name].ToString()),
-						int => int.Parse(dataRow[item.Name].ToString()),
-						long => long.Parse(dataRow[item.Name].ToString()),
-						DateTime => DateTime.Parse(dataRow[item.Name].ToString()),
+						// pattern-matching 不支持 Nullable 所有的nullable类型都会被null匹配 所以nullable对象在Model中的类型和长度必须与Datatable中的一模一样
+						short => dataRow[item.Name] == DBNull.Value ? null : short.Parse(dataRow[item.Name].ToString()),
+						int => dataRow[item.Name] == DBNull.Value ? null : int.Parse(dataRow[item.Name].ToString()),
+						long => dataRow[item.Name] == DBNull.Value ? null : long.Parse(dataRow[item.Name].ToString()),
+						decimal => dataRow[item.Name] == DBNull.Value ? null : decimal.Parse(dataRow[item.Name].ToString()),
+						float => dataRow[item.Name] == DBNull.Value ? null : float.Parse(dataRow[item.Name].ToString()),
+						double => dataRow[item.Name] == DBNull.Value ? null : double.Parse(dataRow[item.Name].ToString()),
+						DateTime => dataRow[item.Name] == DBNull.Value ? null : DateTime.Parse(dataRow[item.Name].ToString()),
 						//如果可以解析为数字 则数字不为0为true
-						bool => (int.TryParse(dataRow[item.Name].ToString(), out int i) && i != 0) || (bool.TryParse(dataRow[item.Name].ToString(), out bool b) && b),
-						_ => dataRow[item.Name],
+						bool => dataRow[item.Name] == DBNull.Value ? null : (int.TryParse(dataRow[item.Name].ToString(), out int i) && i != 0) || (bool.TryParse(dataRow[item.Name].ToString(), out bool b) && b),
+						//字符串会被null匹配而不是string
+						null => dataRow[item.Name] == DBNull.Value ? null : dataRow[item.Name],
+						string => dataRow[item.Name] == DBNull.Value ? null : dataRow[item.Name],
+						//类成员会被object匹配,不进行更改
+						object => item.GetValue(obj),
 					}
 					);
 				}

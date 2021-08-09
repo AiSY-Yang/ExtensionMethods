@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>netcoreapp3.1;net5.0</TargetFrameworks>
     <RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
-    <Authors>AISY</Authors>
+    <Authors>AiSY-Yang</Authors>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Description>
@@ -14,6 +14,8 @@
       测试覆盖率 60%
       方便写程序的同时兼顾性能
     </Description>
+    <RepositoryUrl>https://github.com/AiSY-Yang/ExtensionMethods</RepositoryUrl>
+    <PackageId>AiSY-Yang.ExtensionMethods</PackageId>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
