@@ -121,7 +121,7 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static string ToJson(this object _object, JsonSerializerOptions jsonSerializerOptions)
 		{
-			return System.Text.Json.JsonSerializer.Serialize(_object, JsonSerializerStandardOptions);
+			return System.Text.Json.JsonSerializer.Serialize(_object, jsonSerializerOptions);
 		}
 		/// <summary>
 		/// 采用System.Text.Json实现,效率更高,默认将时间序列化为yyyy-MM-dd HH:mm:ss格式

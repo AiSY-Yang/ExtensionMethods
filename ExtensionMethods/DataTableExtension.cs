@@ -61,7 +61,7 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static string ToInsertSQL(this DataTable dataTable, bool Replace, bool IncludeColumnName = false)
 		{
-			if (dataTable.TableName.IsNullOrWhiteSpace())
+			if (string.IsNullOrWhiteSpace( dataTable.TableName))
 			{
 				throw new ArgumentException("表名为空");
 			}

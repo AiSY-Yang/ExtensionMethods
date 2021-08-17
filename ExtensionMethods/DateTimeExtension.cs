@@ -14,7 +14,7 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static long ToSecondTimestamp(this DateTime dateTime) => (dateTime.ToUniversalTime().Ticks - 621355968000000000) / 1000_0000;
 		/// <summary>
-		/// 转换为毫秒级时间戳
+		/// 转换为13位毫秒级时间戳
 		/// </summary>
 		/// <param name="dateTime"></param>
 		/// <returns></returns>

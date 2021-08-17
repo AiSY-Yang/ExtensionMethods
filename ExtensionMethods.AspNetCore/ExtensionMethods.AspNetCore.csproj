@@ -11,7 +11,7 @@
     <PackageId>AiSY-Yang.ExtensionMethods.AspNetCore</PackageId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
     <OutputPath>..\Output\</OutputPath>
     <DocumentationFile>..\Output\ExtensionMethods.AspNetCore.xml</DocumentationFile>
   </PropertyGroup>

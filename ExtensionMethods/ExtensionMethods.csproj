@@ -18,7 +18,7 @@
     <PackageId>AiSY-Yang.ExtensionMethods</PackageId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
     <OutputPath>..\Output\</OutputPath>
     <DocumentationFile>..\Output\ExtensionMethods.xml</DocumentationFile>
   </PropertyGroup>

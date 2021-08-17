@@ -37,7 +37,7 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static string TrimEnd(this string _string, string endstr)
 		{
-			if (endstr.IsNullOrEmpty())
+			if (string.IsNullOrEmpty(endstr))
 			{
 				return _string;
 			}
@@ -64,11 +64,11 @@ namespace ExtensionMethods
 		/// 是否包含其中任意一个元素
 		/// </summary>
 		/// <param name="str"></param>
-		/// <param name="ss">字符串数组</param>
+		/// <param name="shortStringArray">字符串数组</param>
 		/// <returns></returns>
-		public static bool Contains(this string str, IEnumerable<string> ss)
+		public static bool Contains(this string str, IEnumerable<string> shortStringArray)
 		{
-			foreach (var item in ss)
+			foreach (var item in shortStringArray)
 			{
 				if (str.Contains(item))
 				{
@@ -122,116 +122,17 @@ namespace ExtensionMethods
 		{
 			return string.IsNullOrWhiteSpace(inputStr);
 		}
-#if NET5_0 || NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER
-		/// <summary>
-		/// 加密方式
-		/// </summary>
-		public enum EncryptOption
+
+
+		///<inheritdoc cref="ByteExtension.CRC(byte[], CrcOption)"/>
+		public static string CRC(this string _string, CrcOption crcOption)
 		{
-			/// <summary>
-			/// 转换为Base64编码
-			/// </summary>
-			Base64,
-			/// <summary>
-			/// 计算16位MD5
-			/// </summary>
-			MD5_16,
-			/// <summary>
-			/// 计算32位MD5
-			/// </summary>
-			MD5_32,
-			/// <summary>
-			/// 计算SHA1
-			/// </summary>
-			SHA1,
-			/// <summary>
-			/// 计算SHA256
-			/// </summary>
-			SHA256,
-			/// <summary>
-			/// 计算SHA384
-			/// </summary>
-			SHA384,
-			/// <summary>
-			/// 计算SHA512
-			/// </summary>
-			SHA512,
-			/// <summary>
-			/// HJT212协议CRC校验
-			/// </summary>
-			CRC16_HJT212,
-			/// <summary>
-			/// 计算HmacSHA1
-			/// </summary>
-			HmacSHA1,
-			/// <summary>
-			/// 计算HmacSHA256
-			/// </summary>
-			HmacSHA256,
-			/// <summary>
-			/// 计算HmacSHA384
-			/// </summary>
-			HmacSHA384,
-			/// <summary>
-			/// 计算HmacSHA512
-			/// </summary>
-			HmacSHA512,
-			/// <summary>
-			/// 计算HmacMD5
-			/// </summary>
-			HmacMD5,
-			/// <summary>
-			/// 计算HmacSHA1并base64编码
-			/// </summary>
-			HmacSHA1_Base64,
-			/// <summary>
-			/// 计算HmacSHA256并base64编码
-			/// </summary>
-			HmacSHA256_Base64,
-			/// <summary>
-			/// 计算HmacSHA384并base64编码
-			/// </summary>
-			HmacSHA384_Base64,
-			/// <summary>
-			/// 计算HmacSHA512并base64编码
-			/// </summary>
-			HmacSHA512_Base64,
-			/// <summary>
-			/// 计算HmacMD5并base64编码
-			/// </summary>
-			HmacMD5_Base64,
-			/// <summary>
-			/// DES加密 采用CBC方式 无填充
-			/// </summary>
-			DES_CBC_None,
-			/// <summary>
-			/// DES加密 采用CBC方式 PKCS7方式填充
-			/// </summary>
-			DES_CBC_PKCS7,
-			/// <summary>
-			/// DES加密 采用CBC方式 零填充
-			/// </summary>
-			DES_CBC_Zeros,
-			/// <summary>
-			/// DES加密 采用CBC方式 ANSIX923填充
-			/// </summary>
-			DES_CBC_ANSIX923,
-			//DES_ECB_None,
-			//DES_ECB_PKCS7,
-			//DES_ECB_Zeros,
-			//DES_ECB_ANSIX923,
-			//DES_OFB_None,
-			//DES_OFB_PKCS7,
-			//DES_OFB_Zeros,
-			//DES_OFB_ANSIX923,
-			//DES_CFB_None,
-			//DES_CFB_PKCS7,
-			//DES_CFB_Zeros,
-			//DES_CFB_ANSIX923,
-			//DES_CTS_None,
-			//DES_CTS_PKCS7,
-			//DES_CTS_Zeros,
-			//DES_CTS_ANSIX923,
+			return _string.ToByteArray().CRC(crcOption);
+		}
+		///<inheritdoc cref="ByteExtension.Hash(byte[], HashOption, string)"/>
+		public static string Hash(this string _string, HashOption hashOption, string secret = null)
+		{
+			return _string.ToByteArray().Hash(hashOption, secret);
 		}
 		/// <summary>
 		/// 字符串加密
@@ -244,165 +145,62 @@ namespace ExtensionMethods
 		/// <exception cref="ArgumentException">Thrown when string is null or empty.</exception>
 		public static string Encrypt(this string _string, EncryptOption encryptOption, string secret = null, string iv = null)
 		{
-			if (_string.IsNullOrEmpty())
+			if (string.IsNullOrEmpty(_string))
 			{
 				throw new ArgumentException("String is null or empty");
 			}
 			switch (encryptOption)
 			{
-				case EncryptOption.Base64:
-					return System.Convert.ToBase64String(Encoding.UTF8.GetBytes(_string));
-				case EncryptOption.CRC16_HJT212:
-					byte[] data = _string.ToByteArray();
-					ushort crc = 0xFFFF;
-					int len = data.Length;
-					for (int i = 0; i < len; i++)
-					{
-						crc = (ushort)((crc >> 8) ^ data[i]);
-						for (int j = 0; j < 8; j++)
-							crc = (crc & 1) == 1 ? (ushort)((crc >> 1) ^ 0xA001) : (ushort)(crc >> 1);
-					}
-					return string.Format("{0:X}", crc).PadLeft(4, '0');
-				case EncryptOption.MD5_16:
-					return _string.Encrypt(EncryptOption.MD5_32, secret)[8..24];
-				case EncryptOption.MD5_32:
-				case EncryptOption.SHA1:
-				case EncryptOption.SHA256:
-				case EncryptOption.SHA384:
-				case EncryptOption.SHA512:
-					byte[] hash = encryptOption switch
-					{
-						EncryptOption.MD5_32 => System.Security.Cryptography.MD5.Create().ComputeHash(Encoding.UTF8.GetBytes(_string)),
-						EncryptOption.SHA1 => System.Security.Cryptography.SHA1.Create().ComputeHash(Encoding.UTF8.GetBytes(_string)),
-						EncryptOption.SHA256 => System.Security.Cryptography.SHA256.Create().ComputeHash(Encoding.UTF8.GetBytes(_string)),
-						EncryptOption.SHA384 => System.Security.Cryptography.SHA384.Create().ComputeHash(Encoding.UTF8.GetBytes(_string)),
-						EncryptOption.SHA512 => System.Security.Cryptography.SHA512.Create().ComputeHash(Encoding.UTF8.GetBytes(_string)),
-						_ => throw new ArgumentException(),
-					};
-					StringBuilder builder = new StringBuilder();
-					foreach (var item in hash)
-					{
-						builder.Append(item.ToString("x2"));
-					}
-					return builder.ToString();
-				case EncryptOption.HmacMD5:
-				case EncryptOption.HmacSHA1:
-				case EncryptOption.HmacSHA256:
-				case EncryptOption.HmacSHA384:
-				case EncryptOption.HmacSHA512:
-				case EncryptOption.HmacMD5_Base64:
-				case EncryptOption.HmacSHA1_Base64:
-				case EncryptOption.HmacSHA256_Base64:
-				case EncryptOption.HmacSHA384_Base64:
-				case EncryptOption.HmacSHA512_Base64:
-					if (secret.IsNullOrEmpty())
-					{
-						throw new ArgumentException("for Hmac algorithm,The secret is necessary");
-					}
-					System.Security.Cryptography.HMAC hMAC = encryptOption switch
-					{
-						EncryptOption.HmacMD5 => new System.Security.Cryptography.HMACMD5(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA1 => new System.Security.Cryptography.HMACSHA1(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA256 => new System.Security.Cryptography.HMACSHA256(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA384 => new System.Security.Cryptography.HMACSHA384(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA512 => new System.Security.Cryptography.HMACSHA512(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacMD5_Base64 => new System.Security.Cryptography.HMACMD5(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA1_Base64 => new System.Security.Cryptography.HMACSHA1(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA256_Base64 => new System.Security.Cryptography.HMACSHA256(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA384_Base64 => new System.Security.Cryptography.HMACSHA384(Encoding.UTF8.GetBytes(secret)),
-						EncryptOption.HmacSHA512_Base64 => new System.Security.Cryptography.HMACSHA512(Encoding.UTF8.GetBytes(secret)),
-						_ => throw new ArgumentException(),
-					};
-					byte[] hashmessage = hMAC.ComputeHash(Encoding.UTF8.GetBytes(_string));
-					switch (encryptOption)
-					{
-						case EncryptOption.HmacMD5_Base64:
-						case EncryptOption.HmacSHA1_Base64:
-						case EncryptOption.HmacSHA256_Base64:
-						case EncryptOption.HmacSHA384_Base64:
-						case EncryptOption.HmacSHA512_Base64:
-							return System.Convert.ToBase64String(hashmessage);
-					}
-					StringBuilder stringBuilder = new StringBuilder();
-					foreach (var item in hashmessage)
-					{
-						stringBuilder.Append(item.ToString("x2"));
-					}
-					return stringBuilder.ToString();
 				case EncryptOption.DES_CBC_None:
 				case EncryptOption.DES_CBC_PKCS7:
 				case EncryptOption.DES_CBC_Zeros:
 				case EncryptOption.DES_CBC_ANSIX923:
-					//case EncryptOption.DES_ECB_None:
-					//case EncryptOption.DES_ECB_PKCS7:
-					//case EncryptOption.DES_ECB_Zeros:
-					//case EncryptOption.DES_ECB_ANSIX923:
-					//case EncryptOption.DES_OFB_None:
-					//case EncryptOption.DES_OFB_PKCS7:
-					//case EncryptOption.DES_OFB_Zeros:
-					//case EncryptOption.DES_OFB_ANSIX923:
-					//case EncryptOption.DES_CFB_None:
-					//case EncryptOption.DES_CFB_PKCS7:
-					//case EncryptOption.DES_CFB_Zeros:
-					//case EncryptOption.DES_CFB_ANSIX923:
-					//case EncryptOption.DES_CTS_None:
-					//case EncryptOption.DES_CTS_PKCS7:
-					//case EncryptOption.DES_CTS_Zeros:
-					//case EncryptOption.DES_CTS_ANSIX923:
-					System.Security.Cryptography.DESCryptoServiceProvider des = new System.Security.Cryptography.DESCryptoServiceProvider();
-					switch (encryptOption.ToString()[4..7])
+					System.Security.Cryptography.DESCryptoServiceProvider des = new System.Security.Cryptography.DESCryptoServiceProvider
 					{
-						case "CBC": des.Mode = System.Security.Cryptography.CipherMode.CBC; break;
-						case "ECB": des.Mode = System.Security.Cryptography.CipherMode.ECB; break;
-						case "OFB": des.Mode = System.Security.Cryptography.CipherMode.OFB; break;
-						case "CFB": des.Mode = System.Security.Cryptography.CipherMode.CFB; break;
-						case "CTS": des.Mode = System.Security.Cryptography.CipherMode.CTS; break;
-						default:
-							throw new ArgumentException("加密模式枚举值不存在");
-					}
-					switch (encryptOption.ToString()[8..])
-					{
-						case "None": des.Padding = System.Security.Cryptography.PaddingMode.None; break;
-						case "PKCS7": des.Padding = System.Security.Cryptography.PaddingMode.PKCS7; break;
-						case "Zeros": des.Padding = System.Security.Cryptography.PaddingMode.Zeros; break;
-						case "ANSIX923": des.Padding = System.Security.Cryptography.PaddingMode.ANSIX923; break;
-						case "ISO10126": des.Padding = System.Security.Cryptography.PaddingMode.ISO10126; break;
-						default:
-							throw new ArgumentException("填充模式枚举值不存在");
-					}
-					if (!secret.IsNullOrEmpty())
+						Mode = encryptOption.ToString()[4..7] switch
+						{
+							"CBC" => System.Security.Cryptography.CipherMode.CBC,
+							"ECB" => System.Security.Cryptography.CipherMode.ECB,
+							"OFB" => System.Security.Cryptography.CipherMode.OFB,
+							"CFB" => System.Security.Cryptography.CipherMode.CFB,
+							"CTS" => System.Security.Cryptography.CipherMode.CTS,
+							_ => throw new ArgumentException("加密模式枚举值不存在"),
+						},
+						Padding = encryptOption.ToString()[8..] switch
+						{
+							"None" => System.Security.Cryptography.PaddingMode.None,
+							"PKCS7" => System.Security.Cryptography.PaddingMode.PKCS7,
+							"Zeros" => System.Security.Cryptography.PaddingMode.Zeros,
+							"ANSIX923" => System.Security.Cryptography.PaddingMode.ANSIX923,
+							"ISO10126" => System.Security.Cryptography.PaddingMode.ISO10126,
+							_ => throw new ArgumentException("填充模式枚举值不存在"),
+						}
+					};
+					if (!string.IsNullOrEmpty(secret))
 					{
 						des.Key = Encoding.UTF8.GetBytes(secret);
 					}
-					if (!iv.IsNullOrEmpty())
+					if (!string.IsNullOrEmpty(iv))
 					{
 						des.IV = Encoding.UTF8.GetBytes(iv);
 					}
 					using (System.Security.Cryptography.ICryptoTransform ct = des.CreateEncryptor())
 					{
 						byte[] by = Encoding.UTF8.GetBytes(_string);
-						using (System.IO.MemoryStream ms = new System.IO.MemoryStream())
+						using System.IO.MemoryStream ms = new System.IO.MemoryStream();
+						using (var cs = new System.Security.Cryptography.CryptoStream(ms, ct,
+														 System.Security.Cryptography.CryptoStreamMode.Write))
 						{
-							using (var cs = new System.Security.Cryptography.CryptoStream(ms, ct,
-															 System.Security.Cryptography.CryptoStreamMode.Write))
-							{
-								cs.Write(by, 0, by.Length);
-								cs.FlushFinalBlock();
-							}
-							return System.Convert.ToBase64String(ms.ToArray());
+							cs.Write(by, 0, by.Length);
+							cs.FlushFinalBlock();
 						}
+						return System.Convert.ToBase64String(ms.ToArray());
 					}
 				default:
 					throw new ArgumentException("枚举值不存在");
 			}
 		}
-		/// <summary>
-		/// 解密方式
-		/// </summary>
-		public enum DncryptOption
-		{
 
-		}
 		/// <summary>
 		/// 解密字符串
 		/// </summary>
@@ -411,9 +209,9 @@ namespace ExtensionMethods
 		/// <param name="secret">密钥</param>
 		/// <param name="iv">偏移量</param>
 		/// <returns></returns>
-		public static string Decrypt(this string _string, DncryptOption dncryptOption, string secret = null,string iv=null)
+		public static string Decrypt(this string _string, DncryptOption dncryptOption, string secret = null, string iv = null)
 		{
-			if (_string.IsNullOrEmpty())
+			if (string.IsNullOrEmpty(_string))
 			{
 				throw new ArgumentException("String is null or empty");
 			}
@@ -423,7 +221,6 @@ namespace ExtensionMethods
 					throw new ArgumentException("枚举值不存在"); ;
 			}
 		}
-#endif
 		#region Convert
 		/// <summary>
 		/// 转换为整型,如果为小数则截断小数部分
@@ -475,21 +272,6 @@ namespace ExtensionMethods
 				return defaultResult;
 			}
 		}
-
-
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// </summary>
-		static readonly System.Text.RegularExpressions.Regex yyyyMMddHHWithSplit = new System.Text.RegularExpressions.Regex(@"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}$");
-		static readonly System.Text.RegularExpressions.Regex yyyyMMddHHmmss = new System.Text.RegularExpressions.Regex(@"^\d{14}$");
-		static readonly System.Text.RegularExpressions.Regex yyyyMMddHHmm = new System.Text.RegularExpressions.Regex(@"^\d{12}$");
-		static readonly System.Text.RegularExpressions.Regex yyyyMMddHH = new System.Text.RegularExpressions.Regex(@"^\d{10}$");
-		static readonly System.Text.RegularExpressions.Regex yyyyMMdd = new System.Text.RegularExpressions.Regex(@"^\d{8}$");
-		static readonly System.Text.RegularExpressions.Regex yyyyMM = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-		static readonly System.Text.RegularExpressions.Regex yyyy = new System.Text.RegularExpressions.Regex(@"^\d{4}$");
-		static readonly System.Text.RegularExpressions.Regex timestampSecond = new System.Text.RegularExpressions.Regex(@"^\d{10}$");
-		static readonly System.Text.RegularExpressions.Regex timestampMileSecond = new System.Text.RegularExpressions.Regex(@"^\d{13}$");
-
 		/// <summary>
 		/// 转换到日期时间类型,转换失败时抛出异常
 		/// <code>"yyyy-MM-dd HH:mm:ss"</code>
@@ -506,9 +288,14 @@ namespace ExtensionMethods
 		/// </summary>
 		/// <param name="str"></param>
 		/// <exception cref="FormatException">不是有效的时间格式</exception>
+		/// <exception cref="ArgumentNullException">字符串为空</exception>
 		/// <returns></returns>
 		public static DateTime ToDateTime(this string str)
 		{
+			if (str is null)
+			{
+				throw new ArgumentNullException(nameof(str));
+			}
 			//加快速度 先按照最常用方法解析
 			try
 			{
@@ -516,11 +303,11 @@ namespace ExtensionMethods
 			}
 			catch (Exception)
 			{
-				if (yyyyMMddHHWithSplit.IsMatch(str)) return DateTime.Parse(str + ":00");
-				if (yyyyMMddHHmmss.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:{str[12..14]}");
-				if (yyyyMMddHHmm.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:00");
+				if (RegexCache.yyyyMMddHHWithSplit.IsMatch(str)) return DateTime.Parse(str + ":00");
+				if (RegexCache.yyyyMMddHHmmss.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:{str[12..14]}");
+				if (RegexCache.yyyyMMddHHmm.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:00");
 				//10位数字先按照无分隔符日期判断,如果小于1970年则按照时间戳返回
-				if (yyyyMMddHH.IsMatch(str))
+				if (RegexCache.yyyyMMddHH.IsMatch(str))
 				{
 					try
 					{
@@ -537,10 +324,10 @@ namespace ExtensionMethods
 						return new System.DateTime(1970, 1, 1).ToLocalTime().AddSeconds(long.Parse(str));
 					}
 				}
-				if (yyyyMMdd.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} 00:00:00");
-				if (yyyyMM.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-01 00:00:00");
-				if (yyyy.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-01-01 00:00:00");
-				if (timestampMileSecond.IsMatch(str)) return new DateTime(1970, 1, 1).ToLocalTime().AddMilliseconds(long.Parse(str));
+				if (RegexCache.yyyyMMdd.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} 00:00:00");
+				if (RegexCache.yyyyMM.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-01 00:00:00");
+				if (RegexCache.yyyy.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-01-01 00:00:00");
+				if (RegexCache.timestampMileSecond.IsMatch(str)) return new DateTime(1970, 1, 1).ToLocalTime().AddMilliseconds(long.Parse(str));
 				throw;
 			}
 		}
@@ -607,6 +394,12 @@ namespace ExtensionMethods
 				}
 			}
 		}
+		/// <summary>
+		/// 从UTF8转换为Base64字符串
+		/// </summary>
+		/// <param name="_string"></param>
+		/// <returns></returns>
+		public static string ToBsae64String(this string _string) => System.Convert.ToBase64String(Encoding.UTF8.GetBytes(_string));
 		/// <summary>
 		/// 将字符串当作base64转换为Stream
 		/// </summary>
@@ -755,5 +548,89 @@ namespace ExtensionMethods
 		}
 #endif
 		#endregion
+	}
+	/// <summary>
+	/// 加密方式
+	/// </summary>
+	public enum EncryptOption
+	{
+		/// <summary>
+		/// DES加密 采用CBC方式 无填充
+		/// </summary>
+		DES_CBC_None,
+		/// <summary>
+		/// DES加密 采用CBC方式 PKCS7方式填充
+		/// </summary>
+		DES_CBC_PKCS7,
+		/// <summary>
+		/// DES加密 采用CBC方式 零填充
+		/// </summary>
+		DES_CBC_Zeros,
+		/// <summary>
+		/// DES加密 采用CBC方式 ANSIX923填充
+		/// </summary>
+		DES_CBC_ANSIX923,
+	}
+	/// <summary>
+	/// 解密方式
+	/// </summary>
+	public enum DncryptOption
+	{
+
+	}
+	/// <summary>
+	/// 缓存所用到的正则表达式
+	/// </summary>
+	public static class RegexCache
+	{
+
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>yyyy-M-d H:m</code>
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHHWithSplit = new System.Text.RegularExpressions.Regex(@"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>yyyyMMddHHmmss</code>
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHHmmss = new System.Text.RegularExpressions.Regex(@"^\d{14}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>yyyyMMddHHmm</code>
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHHmm = new System.Text.RegularExpressions.Regex(@"^\d{12}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>yyyyMMddHH</code>
+		/// 与秒级时间戳timestampSecond形式相同
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHH = new System.Text.RegularExpressions.Regex(@"^\d{10}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>yyyyMMdd</code>
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex yyyyMMdd = new System.Text.RegularExpressions.Regex(@"^\d{8}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>yyyyMM</code>
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex yyyyMM = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>yyyy</code>
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex yyyy = new System.Text.RegularExpressions.Regex(@"^\d{4}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>10位秒级时间戳</code>
+		/// 与yyyyMMddHH形式相同
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex timestampSecond = new System.Text.RegularExpressions.Regex(@"^\d{10}$");
+		/// <summary>
+		/// 转换日期时间所用到的正则表达式
+		/// <code>13位毫秒级时间戳</code>
+		/// </summary>
+		internal static readonly System.Text.RegularExpressions.Regex timestampMileSecond = new System.Text.RegularExpressions.Regex(@"^\d{13}$");
+
 	}
 }
