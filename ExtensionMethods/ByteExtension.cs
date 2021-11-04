@@ -39,7 +39,7 @@ namespace ExtensionMethods
 		{
 			switch (crcOption)
 			{
-				case CrcOption.CRC16_HJT212:
+				case CrcOption.CRC16_HJ212:
 					ushort crc = 0xFFFF;
 					int len = byteArray.Length;
 					for (int i = 0; i < len; i++)
@@ -78,7 +78,7 @@ namespace ExtensionMethods
 						HashOption.SHA256 => System.Security.Cryptography.SHA256.Create().ComputeHash(byteArray),
 						HashOption.SHA384 => System.Security.Cryptography.SHA384.Create().ComputeHash(byteArray),
 						HashOption.SHA512 => System.Security.Cryptography.SHA512.Create().ComputeHash(byteArray),
-						_ => throw new System.ArgumentException(),
+						_ => throw new System.ArgumentException("枚举值不存在"),
 					};
 					System.Text.StringBuilder builder = new System.Text.StringBuilder();
 					foreach (var item in hash)
@@ -112,7 +112,7 @@ namespace ExtensionMethods
 						HashOption.HmacSHA256_Base64 => new System.Security.Cryptography.HMACSHA256(System.Text.Encoding.UTF8.GetBytes(secret)),
 						HashOption.HmacSHA384_Base64 => new System.Security.Cryptography.HMACSHA384(System.Text.Encoding.UTF8.GetBytes(secret)),
 						HashOption.HmacSHA512_Base64 => new System.Security.Cryptography.HMACSHA512(System.Text.Encoding.UTF8.GetBytes(secret)),
-						_ => throw new System.ArgumentException(),
+						_ => throw new System.ArgumentException("枚举值不存在"),
 					};
 					byte[] hashmessage = hMAC.ComputeHash(byteArray);
 					switch (hashOption)
@@ -144,7 +144,7 @@ namespace ExtensionMethods
 		/// <summary>
 		/// HJT212协议CRC校验
 		/// </summary>
-		CRC16_HJT212,
+		CRC16_HJ212,
 	}
 	/// <summary>
 	/// HASH类别
@@ -176,24 +176,24 @@ namespace ExtensionMethods
 		/// </summary>
 		SHA512,
 		/// <summary>
-		/// 计算HmacMD5
+		/// HmacMD5的16进制表现形式
 		/// </summary>
 		HmacMD5,
 		/// <summary>
-		/// 计算HmacSHA1
+		/// HmacSHA1的16进制表现形式
 		/// </summary>
 		/// 	
 		HmacSHA1,
 		/// <summary>
-		/// 计算HmacSHA256
+		/// HmacSHA256的16进制表现形式
 		/// </summary>
 		HmacSHA256,
 		/// <summary>
-		/// 计算HmacSHA384
+		/// HmacSHA384的16进制表现形式
 		/// </summary>
 		HmacSHA384,
 		/// <summary>
-		/// 计算HmacSHA512
+		/// HmacSHA512的16进制表现形式
 		/// </summary>
 		HmacSHA512,
 		/// <summary>

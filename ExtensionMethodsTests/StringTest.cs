@@ -87,7 +87,7 @@ namespace ExtensionMethodsTests
 		public void CRC()
 		{
 			Assert.Throws<ArgumentException>(() => "QN=20180427125809000;ST=22;CN=2011;PW=123456;MN=LXHB0CS0306310;Flag=5;CP=&&DataTime=20180427125809;a34004-Rtd=75600.000,a34004-Flag=N;a34002-Rtd=140600.000,a34002-Flag=N;a34001-Rtd=178000.000,a34001-Flag=N;a01001-Rtd=24.8,a01001-Flag=N;a01002-Rtd=46.8,a01002-Flag=N;a01006-Rtd=101.380,a01006-Flag=N;a01007-Rtd=0.0,a01007-Flag=N;a01008-Rtd=25,a01008-Flag=N;LA-Rtd=57.9,LA-Flag=N&&".CRC((CrcOption)(-1)));
-			Assert.Equal("5440", "QN=20180427125809000;ST=22;CN=2011;PW=123456;MN=LXHB0CS0306310;Flag=5;CP=&&DataTime=20180427125809;a34004-Rtd=75600.000,a34004-Flag=N;a34002-Rtd=140600.000,a34002-Flag=N;a34001-Rtd=178000.000,a34001-Flag=N;a01001-Rtd=24.8,a01001-Flag=N;a01002-Rtd=46.8,a01002-Flag=N;a01006-Rtd=101.380,a01006-Flag=N;a01007-Rtd=0.0,a01007-Flag=N;a01008-Rtd=25,a01008-Flag=N;LA-Rtd=57.9,LA-Flag=N&&".CRC(CrcOption.CRC16_HJT212));
+			Assert.Equal("5440", "QN=20180427125809000;ST=22;CN=2011;PW=123456;MN=LXHB0CS0306310;Flag=5;CP=&&DataTime=20180427125809;a34004-Rtd=75600.000,a34004-Flag=N;a34002-Rtd=140600.000,a34002-Flag=N;a34001-Rtd=178000.000,a34001-Flag=N;a01001-Rtd=24.8,a01001-Flag=N;a01002-Rtd=46.8,a01002-Flag=N;a01006-Rtd=101.380,a01006-Flag=N;a01007-Rtd=0.0,a01007-Flag=N;a01008-Rtd=25,a01008-Flag=N;LA-Rtd=57.9,LA-Flag=N&&".CRC(CrcOption.CRC16_HJ212));
 		}
 		[Fact]
 		public void Hash()
@@ -130,7 +130,20 @@ namespace ExtensionMethodsTests
 			Assert.Equal("251F1V4AXBk=", "你好".Encrypt(EncryptOption.DES_CBC_Zeros, "12345678", "87654321"));
 			Assert.Equal("euXBnQ9xZT8=", "a".Encrypt(EncryptOption.DES_CBC_ANSIX923, "12345678", "87654321"));
 			Assert.Equal("c2Z+3TwvMYQ=", "你好".Encrypt(EncryptOption.DES_CBC_ANSIX923, "12345678", "87654321"));
-
+			#endregion
+		}
+		[Fact]
+		public void Decrypt()
+		{
+			#region DES
+			Assert.Equal("abcdefgh", "VrHKOUNsGcA=".Decrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
+			Assert.Equal("你好nh", "UFAZxUlQ7Pc=".Decrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
+			Assert.Equal("a", "BUhZfGyF0Mw=".Decrypt(EncryptOption.DES_CBC_PKCS7, "12345678", "87654321"));
+			Assert.Equal("你好", "5GgZng1JeGk=".Decrypt(EncryptOption.DES_CBC_PKCS7, "12345678", "87654321"));
+			Assert.Equal("a\0\0\0\0\0\0\0", "8KM3WaJc8iw=".Decrypt(EncryptOption.DES_CBC_Zeros, "12345678", "87654321"));
+			Assert.Equal("你好\0\0", "251F1V4AXBk=".Decrypt(EncryptOption.DES_CBC_Zeros, "12345678", "87654321"));
+			Assert.Equal("a", "euXBnQ9xZT8=".Decrypt(EncryptOption.DES_CBC_ANSIX923, "12345678", "87654321"));
+			Assert.Equal("你好", "c2Z+3TwvMYQ=".Decrypt(EncryptOption.DES_CBC_ANSIX923, "12345678", "87654321"));
 			#endregion
 		}
 		[Fact]
@@ -194,6 +207,30 @@ namespace ExtensionMethodsTests
 			Assert.Equal(123, "123.123".ToInt(7));
 			Assert.Equal(0, "0.123".ToInt(7));
 			Assert.Equal(0, ".123".ToInt(7));
+		}
+		[Fact]
+		public void ToDouble()
+		{
+			Assert.Throws<FormatException>(() => "你好".ToDouble());
+			Assert.Throws<OverflowException>(() => "1.7976931348623157E+309".ToDouble());
+			Assert.Equal(123, "123".ToDouble());
+			Assert.Equal(123, "123.".ToDouble());
+			Assert.Equal(123.123, "123.123".ToDouble());
+			Assert.Equal(0.123, "0.123".ToDouble());
+			Assert.Equal(0.123, ".123".ToDouble());
+
+			Assert.Equal(1.234, "你好".ToDouble(1.234));
+			Assert.Equal(1.234, "1.7976931348623157E+309".ToDouble(1.234));
+			Assert.Equal(123, "123".ToDouble(1.234));
+			Assert.Equal(123, "123.".ToDouble(1.234));
+			Assert.Equal(123.123, "123.123".ToDouble(1.234));
+			Assert.Equal(0.123, "0.123".ToDouble(1.234));
+			Assert.Equal(0.123, ".123".ToDouble(1.234));
+		}
+		[Fact]
+		public void ToBsae64String()
+		{
+			Assert.Equal("5L2g5aW9", "你好".ToBsae64String());
 		}
 	}
 }

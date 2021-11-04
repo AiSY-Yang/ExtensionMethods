@@ -11,6 +11,45 @@ namespace ExtensionMethods
 	/// </summary>
 	public static class ObjectExtension
 	{
+		static ObjectExtension()
+		{
+			JsonConverterForType jsonConverterForType = new JsonConverterForType();
+			//标准序列化
+			JsonSerializerStandardOptions = new System.Text.Json.JsonSerializerOptions
+			{
+				//WriteIndented = true,
+#if NET5_0
+				IncludeFields = true,
+#endif
+				Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+			};
+			JsonSerializerStandardOptions.Converters.Add(jsonConverterForType);
+
+			//忽略循环序列化
+			JsonSerializerStandardOptionsWithNoCycle = new System.Text.Json.JsonSerializerOptions
+			{
+				//WriteIndented = true,
+#if NET5_0
+				IncludeFields = true,
+				ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
+#endif
+				Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
+			};
+			JsonSerializerStandardOptionsWithNoCycle.Converters.Add(jsonConverterForType);
+
+			//带时间格式的序列化
+			JsonSerializerStandardOptionsWithCommonTimeFormat = new System.Text.Json.JsonSerializerOptions
+			{
+				//WriteIndented = true,
+
+#if NET5_0_OR_GREATER
+				IncludeFields = true,
+#endif
+				Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
+			};
+			JsonSerializerStandardOptionsWithCommonTimeFormat.Converters.Add(jsonConverterForType);
+			JsonSerializerStandardOptionsWithCommonTimeFormat.Converters.Add(new JsonConverterDateTimeStandard());
+		}
 		/// <summary>
 		/// 输出所有属性和字段
 		/// </summary>
@@ -64,54 +103,94 @@ namespace ExtensionMethods
 			return Newtonsoft.Json.JsonConvert.SerializeObject(_object, new Newtonsoft.Json.Converters.IsoDateTimeConverter() { DateTimeFormat = timeFormat });
 		}
 #if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+		#region JsonConverter
 		/// <summary>
 		/// Json日期转换器,格式为<code>yyyy-MM-dd HH:mm:ss</code>
 		/// </summary>
 		private class JsonConverterDateTimeStandard : System.Text.Json.Serialization.JsonConverter<DateTime>
 		{
-			///<inheritdoc/>
-			public override DateTime Read(
-				ref System.Text.Json.Utf8JsonReader reader,
-				Type typeToConvert,
-				System.Text.Json.JsonSerializerOptions options) =>
-					DateTime.ParseExact(reader.GetString(),
-						"yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
-			///<inheritdoc/>
-			public override void Write(
-				System.Text.Json.Utf8JsonWriter writer,
-				DateTime dateTimeValue,
-				System.Text.Json.JsonSerializerOptions options) =>
-					writer.WriteStringValue(dateTimeValue.ToString(
-						"yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
+			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Read(ref Utf8JsonReader, Type, JsonSerializerOptions)"/>
+			public override DateTime Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options) =>
+					DateTime.ParseExact(reader.GetString(), "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Write(Utf8JsonWriter, T, JsonSerializerOptions)"/>
+			public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime dateTimeValue, System.Text.Json.JsonSerializerOptions options) =>
+					writer.WriteStringValue(dateTimeValue.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
 		}
 		/// <summary>
-		/// 缓存的标准序列化选项,在第一次调用的时候初始化,文字不进行编码,
+		/// 解决Type类型的序列化
+		/// <a href="https://stackoverflow.com/questions/66919668/net-core-graphql-graphql-systemtextjson-serialization-and-deserialization-of/67001480">https://stackoverflow.com</a>
+		/// </summary>
+		private class JsonConverterForType : System.Text.Json.Serialization.JsonConverter<Type>
+		{
+			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Read(ref Utf8JsonReader, Type, JsonSerializerOptions)"/>
+			public override Type Read(
+				ref Utf8JsonReader reader,
+				Type typeToConvert,
+				JsonSerializerOptions options
+				)
+			{
+				// Caution: Deserialization of type instances like this 
+				// is not recommended and should be avoided
+				// since it can lead to potential security issues.
+
+				// If you really want this supported (for instance if the JSON input is trusted):
+				// string assemblyQualifiedName = reader.GetString();
+				// return Type.GetType(assemblyQualifiedName);
+				throw new NotSupportedException();
+			}
+
+			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Write(Utf8JsonWriter, T, JsonSerializerOptions)"/>
+			public override void Write(
+				Utf8JsonWriter writer,
+				Type value,
+				JsonSerializerOptions options
+				)
+			{
+				string assemblyQualifiedName = value?.AssemblyQualifiedName;
+				// Use this with caution, since you are disclosing type information.
+				writer.WriteStringValue(assemblyQualifiedName);
+			}
+		}
+		#endregion
+
+		/// <summary>
+		/// 缓存的标准序列化选项,不编码任何内容,不带缩进的压缩格式
 		/// </summary>
 		private static System.Text.Json.JsonSerializerOptions JsonSerializerStandardOptions { get; set; }
 		/// <summary>
-		/// 缓存的标准序列化选项,在第一次调用的时候初始化,文字不进行编码,指定时间格式
-		/// </summary>
-		private static System.Text.Json.JsonSerializerOptions JsonSerializerStandardOptionsWithCommonTimeFormat { get; set; }
-		/// <summary>
 		/// 采用System.Text.Json实现,效率更高,按照不进行编码的方式序列化对象
-		/// <code>!!!.net3.1程序无法序列化字段,.net5.0默认序列化字段</code>
 		/// </summary>
 		/// <param name="_object"></param>
 		/// <returns></returns>
 		public static string ToJson(this object _object)
 		{
-			if (JsonSerializerStandardOptions is null)
-			{
-				JsonSerializerStandardOptions = new System.Text.Json.JsonSerializerOptions
-				{
-					WriteIndented = true,
-#if NET5_0
-					IncludeFields = true,
-#endif
-					Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
-				};
-			}
 			return System.Text.Json.JsonSerializer.Serialize(_object, JsonSerializerStandardOptions);
+		}
+		/// <summary>
+		/// 缓存的忽略循环序列化选项,文字不进行编码,
+		/// </summary>
+		private static System.Text.Json.JsonSerializerOptions JsonSerializerStandardOptionsWithNoCycle { get; set; }
+		/// <summary>
+		/// 采用System.Text.Json实现,效率更高,忽略循环引用对象 会导致添加$type信息
+		/// </summary>
+		/// <param name="_object"></param>
+		/// <returns></returns>
+		public static string ToJsonNoCycle(this object _object)
+		{
+			return System.Text.Json.JsonSerializer.Serialize(_object, JsonSerializerStandardOptionsWithNoCycle);
+		}
+		/// <summary>
+		/// 缓存的标准序列化选项,在第一次调用的时候初始化,文字不进行编码,指定时间格式
+		/// </summary>
+		private static System.Text.Json.JsonSerializerOptions JsonSerializerStandardOptionsWithCommonTimeFormat { get; set; }
+		/// <summary>
+		/// 采用System.Text.Json实现,效率更高,默认将时间序列化为yyyy-MM-dd HH:mm:ss格式
+		/// </summary>
+		/// <param name="_object"></param>
+		/// <returns></returns>
+		public static string ToJsonWithCommonTimeFormat(this object _object)
+		{
+			return System.Text.Json.JsonSerializer.Serialize(_object, JsonSerializerStandardOptionsWithCommonTimeFormat);
 		}
 		/// <summary>
 		/// 按照自定的序列化选项进行序列化
@@ -123,29 +202,7 @@ namespace ExtensionMethods
 		{
 			return System.Text.Json.JsonSerializer.Serialize(_object, jsonSerializerOptions);
 		}
-		/// <summary>
-		/// 采用System.Text.Json实现,效率更高,默认将时间序列化为yyyy-MM-dd HH:mm:ss格式
-		/// <code>!!!.net3.1程序无法序列化字段,.net5.0默认序列化字段</code>
-		/// </summary>
-		/// <param name="_object"></param>
-		/// <returns></returns>
-		public static string ToJsonWithCommonTimeFormat(this object _object)
-		{
-			if (JsonSerializerStandardOptionsWithCommonTimeFormat is null)
-			{
-				JsonSerializerStandardOptionsWithCommonTimeFormat = new System.Text.Json.JsonSerializerOptions
-				{
-					WriteIndented = true,
 
-#if NET5_0_OR_GREATER
-					IncludeFields = true,
-#endif
-					Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
-				};
-				JsonSerializerStandardOptionsWithCommonTimeFormat.Converters.Add(new JsonConverterDateTimeStandard());
-			}
-			return System.Text.Json.JsonSerializer.Serialize(_object, JsonSerializerStandardOptionsWithCommonTimeFormat);
-		}
 #endif
 		#endregion
 #if NET5_0_OR_GREATER

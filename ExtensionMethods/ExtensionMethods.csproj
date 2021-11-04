@@ -21,6 +21,7 @@
   <PropertyGroup>
     <OutputPath>..\Output\</OutputPath>
     <DocumentationFile>..\Output\ExtensionMethods.xml</DocumentationFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
 

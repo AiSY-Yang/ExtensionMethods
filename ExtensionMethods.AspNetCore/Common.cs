@@ -14,26 +14,9 @@
 		{
 			if (System.IO.File.Exists(Name))
 			{
-				if (MIME.ContainsKey(System.IO.Path.GetExtension(Name).Remove(0, 1)))
-				{
-					return MIME[System.IO.Path.GetExtension(Name).Remove(0, 1)];
-				}
+				Name = System.IO.Path.GetExtension(Name).Remove(0, 1);
 			}
-			else
-			{
-				if (MIME.ContainsKey(Name))
-				{
-					try
-					{
-						return MIME[Name];
-
-					}
-					catch (System.Collections.Generic.KeyNotFoundException)
-					{
-					}
-				}
-			}
-			return "application/octet-stream";
+			return MIME.ContainsKey(Name) ? MIME[Name] : "application/octet-stream";
 		}
 
 		private static readonly System.Collections.Generic.Dictionary<string, string> MIME = new System.Collections.Generic.Dictionary<string, string>
@@ -227,6 +210,5 @@
 	{"xyz", "chemical/x-xyz"},
 	{"zip", "application/zip"}
   };
-
 	}
 }

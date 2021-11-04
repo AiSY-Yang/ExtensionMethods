@@ -49,7 +49,10 @@ namespace ExtensionMethods
 		/// <returns>当前对象</returns>
 		public static Image Base64ToImage(this Image image, string base64)
 		{
-			base64 = base64.Replace("data:image/png;base64,", "").Replace("data:image/jgp;base64,", "").Replace("data:image/jpg;base64,", "").Replace("data:image/jpeg;base64,", "");//将base64头部信息替换
+			base64 = base64
+				.Replace("data:image/png;base64,", "")
+				.Replace("data:image/jpg;base64,", "")
+				.Replace("data:image/jpeg;base64,", "");//将base64头部信息替换
 			byte[] bytes = Convert.FromBase64String(base64);
 			System.IO.MemoryStream memStream = new System.IO.MemoryStream(bytes);
 			image = Image.FromStream(memStream);

@@ -127,12 +127,12 @@ namespace ExtensionMethods
 		///<inheritdoc cref="ByteExtension.CRC(byte[], CrcOption)"/>
 		public static string CRC(this string _string, CrcOption crcOption)
 		{
-			return _string.ToByteArray().CRC(crcOption);
+			return Encoding.UTF8.GetBytes(_string).CRC(crcOption);
 		}
 		///<inheritdoc cref="ByteExtension.Hash(byte[], HashOption, string)"/>
 		public static string Hash(this string _string, HashOption hashOption, string secret = null)
 		{
-			return _string.ToByteArray().Hash(hashOption, secret);
+			return Encoding.UTF8.GetBytes(_string).Hash(hashOption, secret);
 		}
 		/// <summary>
 		/// 字符串加密
@@ -155,7 +155,7 @@ namespace ExtensionMethods
 				case EncryptOption.DES_CBC_PKCS7:
 				case EncryptOption.DES_CBC_Zeros:
 				case EncryptOption.DES_CBC_ANSIX923:
-					System.Security.Cryptography.DESCryptoServiceProvider des = new System.Security.Cryptography.DESCryptoServiceProvider
+					using (System.Security.Cryptography.DESCryptoServiceProvider des = new System.Security.Cryptography.DESCryptoServiceProvider
 					{
 						Mode = encryptOption.ToString()[4..7] switch
 						{
@@ -175,26 +175,23 @@ namespace ExtensionMethods
 							"ISO10126" => System.Security.Cryptography.PaddingMode.ISO10126,
 							_ => throw new ArgumentException("填充模式枚举值不存在"),
 						}
-					};
-					if (!string.IsNullOrEmpty(secret))
+					})
 					{
-						des.Key = Encoding.UTF8.GetBytes(secret);
-					}
-					if (!string.IsNullOrEmpty(iv))
-					{
-						des.IV = Encoding.UTF8.GetBytes(iv);
-					}
-					using (System.Security.Cryptography.ICryptoTransform ct = des.CreateEncryptor())
-					{
-						byte[] by = Encoding.UTF8.GetBytes(_string);
-						using System.IO.MemoryStream ms = new System.IO.MemoryStream();
-						using (var cs = new System.Security.Cryptography.CryptoStream(ms, ct,
-														 System.Security.Cryptography.CryptoStreamMode.Write))
+						if (!string.IsNullOrEmpty(secret))
 						{
-							cs.Write(by, 0, by.Length);
-							cs.FlushFinalBlock();
+							des.Key = Encoding.UTF8.GetBytes(secret);
 						}
-						return System.Convert.ToBase64String(ms.ToArray());
+						if (!string.IsNullOrEmpty(iv))
+						{
+							des.IV = Encoding.UTF8.GetBytes(iv);
+						}
+						using System.Security.Cryptography.ICryptoTransform ct = des.CreateEncryptor();
+						byte[] by = Encoding.UTF8.GetBytes(_string);
+						using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
+						using var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write);
+						cs.Write(by, 0, by.Length);
+						cs.FlushFinalBlock();
+						return System.Convert.ToBase64String(outStream.ToArray());
 					}
 				default:
 					throw new ArgumentException("枚举值不存在");
@@ -205,20 +202,64 @@ namespace ExtensionMethods
 		/// 解密字符串
 		/// </summary>
 		/// <param name="_string">字符串</param>
-		/// <param name="dncryptOption">解密方式</param>
+		/// <param name="decryptOption">解密方式</param>
 		/// <param name="secret">密钥</param>
 		/// <param name="iv">偏移量</param>
 		/// <returns></returns>
-		public static string Decrypt(this string _string, DncryptOption dncryptOption, string secret = null, string iv = null)
+		public static string Decrypt(this string _string, EncryptOption decryptOption, string secret = null, string iv = null)
 		{
 			if (string.IsNullOrEmpty(_string))
 			{
 				throw new ArgumentException("String is null or empty");
 			}
-			switch (dncryptOption)
+			switch (decryptOption)
 			{
+				case EncryptOption.DES_CBC_None:
+				case EncryptOption.DES_CBC_PKCS7:
+				case EncryptOption.DES_CBC_Zeros:
+				case EncryptOption.DES_CBC_ANSIX923:
+					using (System.Security.Cryptography.DESCryptoServiceProvider des = new System.Security.Cryptography.DESCryptoServiceProvider
+					{
+						Mode = decryptOption.ToString()[4..7] switch
+						{
+							"CBC" => System.Security.Cryptography.CipherMode.CBC,
+							"ECB" => System.Security.Cryptography.CipherMode.ECB,
+							"OFB" => System.Security.Cryptography.CipherMode.OFB,
+							"CFB" => System.Security.Cryptography.CipherMode.CFB,
+							"CTS" => System.Security.Cryptography.CipherMode.CTS,
+							_ => throw new ArgumentException("加密模式枚举值不存在"),
+						},
+						Padding = decryptOption.ToString()[8..] switch
+						{
+							"None" => System.Security.Cryptography.PaddingMode.None,
+							"PKCS7" => System.Security.Cryptography.PaddingMode.PKCS7,
+							"Zeros" => System.Security.Cryptography.PaddingMode.Zeros,
+							"ANSIX923" => System.Security.Cryptography.PaddingMode.ANSIX923,
+							"ISO10126" => System.Security.Cryptography.PaddingMode.ISO10126,
+							_ => throw new ArgumentException("填充模式枚举值不存在"),
+						}
+					})
+					{
+						if (!string.IsNullOrEmpty(secret))
+						{
+							des.Key = Encoding.UTF8.GetBytes(secret);
+						}
+						if (!string.IsNullOrEmpty(iv))
+						{
+							des.IV = Encoding.UTF8.GetBytes(iv);
+						}
+						using System.Security.Cryptography.ICryptoTransform ct = des.CreateDecryptor();
+						byte[] by = System.Convert.FromBase64String(_string);
+						using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
+						using (var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write))
+						{
+							cs.Write(by, 0, by.Length);
+							cs.FlushFinalBlock();
+						}
+						return Encoding.UTF8.GetString(outStream.ToArray());
+					}
 				default:
-					throw new ArgumentException("枚举值不存在"); ;
+					throw new ArgumentException("枚举值不存在");
 			}
 		}
 		#region Convert
@@ -239,18 +280,8 @@ namespace ExtensionMethods
 				}
 				catch (FormatException)
 				{
-					try
-					{
-						return (int)double.Parse(str);
-					}
-					catch (FormatException ex)
-					{
-						throw new FormatException($"{str} is not a number", ex);
-					}
-					catch (OverflowException ex)
-					{
-						throw new NotFiniteNumberException($"result overflow", ex);
-					}
+
+					return (int)double.Parse(str);
 				}
 			}
 
@@ -266,6 +297,48 @@ namespace ExtensionMethods
 			try
 			{
 				return str.ToInt();
+			}
+			catch (Exception)
+			{
+				return defaultResult;
+			}
+		}
+		/// <summary>
+		/// 转换为double
+		/// </summary>
+		/// <param name="str"></param>
+		/// <returns></returns>
+		/// <exception cref="FormatException"></exception>
+		/// <exception cref="OverflowException"></exception>
+		public static double ToDouble(this string str)
+		{
+			checked
+			{
+				try
+				{
+					var x = double.Parse(str);
+					if (double.IsInfinity(x))
+						throw new OverflowException($"result overflow");
+					else return x;
+				}
+				catch (FormatException ex)
+				{
+					throw new FormatException($"{str} is not a number", ex);
+				}
+			}
+
+		}
+		/// <summary>
+		/// 转换为double,转换失败(NAN or overflow)则返回指定数字
+		/// </summary>
+		/// <param name="str"></param>
+		/// <param name="defaultResult">转换失败后返回的结果</param>
+		/// <returns></returns>
+		public static double ToDouble(this string str, double defaultResult)
+		{
+			try
+			{
+				return str.ToDouble();
 			}
 			catch (Exception)
 			{
@@ -439,6 +512,20 @@ namespace ExtensionMethods
 		}
 #if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
 		/// <summary>
+		/// 反序列化选项
+		/// </summary>
+		static System.Text.Json.JsonSerializerOptions JsonDeserializeOptions = new System.Text.Json.JsonSerializerOptions()
+		{
+			//允许注释
+			ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
+#if NET5_0_OR_GREATER
+			//允许带引号的数字
+			NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
+#endif
+			//允许尾随逗号
+			AllowTrailingCommas = true,
+		};
+		/// <summary>
 		/// 把字符串当作json转换到指定类型
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -446,7 +533,7 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static T AsJsonToObject<T>(this string json)
 		{
-			return System.Text.Json.JsonSerializer.Deserialize<T>(json);
+			return System.Text.Json.JsonSerializer.Deserialize<T>(json, JsonDeserializeOptions);
 		}
 		/// <summary>
 		/// 把字符串当作json转换为类定义字符串,保留大小写,对象为嵌套类且属性已进行初始化
@@ -455,23 +542,24 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static string AsJsonToClassDefine(this string _json)
 		{
-			System.Text.Json.JsonElement dx = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(_json);
 			List<string> ls = new List<string>();
+			System.Text.Json.JsonElement element = _json.AsJsonToObject<System.Text.Json.JsonElement>();
 			ls.Add("public class ROOT {\r\n");
-			RecursionJsonElement(dx);
+			RecursionJsonElement(element);
 			ls.Add("\r\n}");
 			void RecursionJsonElement(System.Text.Json.JsonElement element, int level = 0)
 			{
 				switch (element.ValueKind)
 				{
 					case System.Text.Json.JsonValueKind.Undefined:
-						throw new ArgumentException();
+						throw new ArgumentException("Impossible");
 					case System.Text.Json.JsonValueKind.Object:
 						foreach (var item in element.EnumerateObject())
 							RecursionJsonProperty(item, level + 1);
 						break;
 					case System.Text.Json.JsonValueKind.Array:
-						throw new ArgumentException();
+						RecursionJsonElement(element.EnumerateArray().First(), level);
+						break;
 					case System.Text.Json.JsonValueKind.String:
 						ls.Remove(ls[^1]);
 						ls[^1] = System.Text.RegularExpressions.Regex.Replace(ls[^1], "<.*?>", "<string>");
@@ -496,9 +584,9 @@ namespace ExtensionMethods
 						ls.Add("^1");
 						break;
 					case System.Text.Json.JsonValueKind.Null:
-						throw new ArgumentException();
+						throw new ArgumentException("Impossible");
 					default:
-						throw new ArgumentException();
+						throw new ArgumentException("Impossible");
 				}
 			}
 			void RecursionJsonProperty(System.Text.Json.JsonProperty property, int level)
@@ -555,7 +643,7 @@ namespace ExtensionMethods
 	public enum EncryptOption
 	{
 		/// <summary>
-		/// DES加密 采用CBC方式 无填充
+		/// DES加密 采用CBC方式 无填充 明文字节数必须为8的倍数
 		/// </summary>
 		DES_CBC_None,
 		/// <summary>
@@ -563,20 +651,13 @@ namespace ExtensionMethods
 		/// </summary>
 		DES_CBC_PKCS7,
 		/// <summary>
-		/// DES加密 采用CBC方式 零填充
+		/// DES加密 采用CBC方式 零填充 解密后不足8位的部分补<c>\0</c>
 		/// </summary>
 		DES_CBC_Zeros,
 		/// <summary>
 		/// DES加密 采用CBC方式 ANSIX923填充
 		/// </summary>
 		DES_CBC_ANSIX923,
-	}
-	/// <summary>
-	/// 解密方式
-	/// </summary>
-	public enum DncryptOption
-	{
-
 	}
 	/// <summary>
 	/// 缓存所用到的正则表达式
