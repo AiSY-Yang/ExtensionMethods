@@ -356,8 +356,6 @@ namespace ExtensionMethods
 		/// <code>"yyyyMMdd"</code>
 		/// <code>"yyyyMM"</code>
 		/// <code>"yyyy"</code>
-		/// <code>"时间戳/秒"</code>
-		/// <code>"时间戳/毫秒"</code>
 		/// </summary>
 		/// <param name="str"></param>
 		/// <exception cref="FormatException">不是有效的时间格式</exception>
@@ -365,10 +363,6 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static DateTime ToDateTime(this string str)
 		{
-			if (str is null)
-			{
-				throw new ArgumentNullException(nameof(str));
-			}
 			//加快速度 先按照最常用方法解析
 			try
 			{
@@ -379,28 +373,10 @@ namespace ExtensionMethods
 				if (RegexCache.yyyyMMddHHWithSplit.IsMatch(str)) return DateTime.Parse(str + ":00");
 				if (RegexCache.yyyyMMddHHmmss.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:{str[12..14]}");
 				if (RegexCache.yyyyMMddHHmm.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:00");
-				//10位数字先按照无分隔符日期判断,如果小于1970年则按照时间戳返回
-				if (RegexCache.yyyyMMddHH.IsMatch(str))
-				{
-					try
-					{
-						DateTime dateTime;
-						dateTime = DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:00:00");
-						if (dateTime < new System.DateTime(1970, 1, 1))
-						{
-							return new System.DateTime(1970, 1, 1).ToLocalTime().AddSeconds(long.Parse(str));
-						}
-						return dateTime;
-					}
-					catch (FormatException)
-					{
-						return new System.DateTime(1970, 1, 1).ToLocalTime().AddSeconds(long.Parse(str));
-					}
-				}
+				if (RegexCache.yyyyMMddHH.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:00:00");
 				if (RegexCache.yyyyMMdd.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} 00:00:00");
 				if (RegexCache.yyyyMM.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-01 00:00:00");
 				if (RegexCache.yyyy.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-01-01 00:00:00");
-				if (RegexCache.timestampMileSecond.IsMatch(str)) return new DateTime(1970, 1, 1).ToLocalTime().AddMilliseconds(long.Parse(str));
 				throw;
 			}
 		}
@@ -415,8 +391,6 @@ namespace ExtensionMethods
 		/// <code>"yyyyMMdd"</code>
 		/// <code>"yyyyMM"</code>
 		/// <code>"yyyy"</code>
-		/// <code>"时间戳/秒"</code>
-		/// <code>"时间戳/毫秒"</code>
 		/// </summary>
 		/// <param name="str"></param>
 		/// <param name="defaultDateTime">转换失败的时候返回的时间</param>
@@ -450,11 +424,7 @@ namespace ExtensionMethods
 		public static T Convert<T>(this string str)
 		{
 			var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(T));
-			if (converter == null)
-			{
-				return str.AsJsonToObject<T>();
-			}
-			else
+			try
 			{
 				try
 				{
@@ -462,9 +432,12 @@ namespace ExtensionMethods
 				}
 				catch (Exception)
 				{
-
-					throw new Exception("转换失败");
+					return str.AsJsonToObject<T>();
 				}
+			}
+			catch (Exception)
+			{
+				throw new Exception("转换失败");
 			}
 		}
 		/// <summary>
@@ -514,7 +487,7 @@ namespace ExtensionMethods
 		/// <summary>
 		/// 反序列化选项
 		/// </summary>
-		static System.Text.Json.JsonSerializerOptions JsonDeserializeOptions = new System.Text.Json.JsonSerializerOptions()
+		static readonly System.Text.Json.JsonSerializerOptions JsonDeserializeOptions = new System.Text.Json.JsonSerializerOptions()
 		{
 			//允许注释
 			ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
@@ -701,17 +674,6 @@ namespace ExtensionMethods
 		/// <code>yyyy</code>
 		/// </summary>
 		internal static readonly System.Text.RegularExpressions.Regex yyyy = new System.Text.RegularExpressions.Regex(@"^\d{4}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>10位秒级时间戳</code>
-		/// 与yyyyMMddHH形式相同
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex timestampSecond = new System.Text.RegularExpressions.Regex(@"^\d{10}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>13位毫秒级时间戳</code>
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex timestampMileSecond = new System.Text.RegularExpressions.Regex(@"^\d{13}$");
 
 	}
 }

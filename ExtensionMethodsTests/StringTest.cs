@@ -56,6 +56,7 @@ namespace ExtensionMethodsTests
 		[Fact]
 		public void RemoveChineseChar()
 		{
+			Assert.Equal("qwer", "qwer".RemoveChineseChar());
 			Assert.Equal("qw", "qw中文".RemoveChineseChar());
 			Assert.Equal("qw", "中文qw".RemoveChineseChar());
 			Assert.Equal("qw", "中文q中文w".RemoveChineseChar());
@@ -122,6 +123,7 @@ namespace ExtensionMethodsTests
 		public void Encrypt()
 		{
 			#region DES
+			Assert.Throws<ArgumentException>(() => "".Encrypt(0, "12345678", "87654321"));
 			Assert.Equal("VrHKOUNsGcA=", "abcdefgh".Encrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
 			Assert.Equal("UFAZxUlQ7Pc=", "你好nh".Encrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
 			Assert.Equal("BUhZfGyF0Mw=", "a".Encrypt(EncryptOption.DES_CBC_PKCS7, "12345678", "87654321"));
@@ -136,6 +138,7 @@ namespace ExtensionMethodsTests
 		public void Decrypt()
 		{
 			#region DES
+			Assert.Throws<ArgumentException>(() => "".Decrypt(0, "12345678", "87654321"));
 			Assert.Equal("abcdefgh", "VrHKOUNsGcA=".Decrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
 			Assert.Equal("你好nh", "UFAZxUlQ7Pc=".Decrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
 			Assert.Equal("a", "BUhZfGyF0Mw=".Decrypt(EncryptOption.DES_CBC_PKCS7, "12345678", "87654321"));
@@ -146,6 +149,7 @@ namespace ExtensionMethodsTests
 			Assert.Equal("你好", "c2Z+3TwvMYQ=".Decrypt(EncryptOption.DES_CBC_ANSIX923, "12345678", "87654321"));
 			#endregion
 		}
+		#region Convert
 		[Fact]
 		public void ToByteArray()
 		{
@@ -162,15 +166,12 @@ namespace ExtensionMethodsTests
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "20060102150405".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:00"), "200601021504".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-02 15:00:00"), "2006010215".ToDateTime());
-			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "1136185445".ToDateTime());
-			//1970年之前
-			Assert.Equal(DateTime.Parse("2031-10-18 22:46:41"), "1950101201".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-02 00:00:00"), "20060102".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "200601".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-02-01 00:00:00"), "200602".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "2006".ToDateTime());
-			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "1136185445000".ToDateTime());
 			Assert.Throws<FormatException>(() => "1".ToDateTime());
+
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "2006-01-02 15:04:05".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:00"), "2006-01-02 15:04".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-01-02 15:00:00"), "2006-01-02 15".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
@@ -178,14 +179,10 @@ namespace ExtensionMethodsTests
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "20060102150405".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:00"), "200601021504".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-01-02 15:00:00"), "2006010215".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
-			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "1136185445".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
-			//1970年之前
-			Assert.Equal(DateTime.Parse("2031-10-18 22:46:41"), "1950101201".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-01-02 00:00:00"), "20060102".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "200601".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-02-01 00:00:00"), "200602".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "2006".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
-			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "1136185445000".ToDateTime());
 
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "1".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 		}
@@ -231,6 +228,54 @@ namespace ExtensionMethodsTests
 		public void ToBsae64String()
 		{
 			Assert.Equal("5L2g5aW9", "你好".ToBsae64String());
+		}
+		[Fact]
+		public void Convert()
+		{
+			Assert.Equal(1, "1".Convert<int>());
+			Assert.Equal(1D, "1".Convert<double>());
+			Assert.Equal(1.1F, "1.1".Convert<float>());
+			Assert.Equal(1.1D, "1.1".Convert<double>());
+			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "2006-01-01 00:00:00".Convert<DateTime>());
+			Assert.Equal(new Obj(), new Obj().ToJson().Convert<Obj>());
+		}
+		#endregion
+		#region Json
+		[Fact]
+		public void AsJsonToObject()
+		{
+			List<int> ls = new List<int> { 1, 2, 3 };
+			string lsJson = @"[1,2,3]";
+			Assert.Equal(ls, lsJson.AsJsonToObject<List<int>>());
+			Obj obj = new Obj() { N = 1, S = "a", Array = null };
+			string objJson = @"{""N"":1,""S"":""a"",""Array"":null}";
+			Assert.Equal(obj, objJson.AsJsonToObject<Obj>());
+			obj.Array = ls;
+			objJson = @"{""N"":1,""S"":""a"",""Array"":[1,2,3]}";
+			Assert.Equal(obj, objJson.AsJsonToObject<Obj>());
+		}
+		#endregion
+	}
+	class Obj
+	{
+		public int N { get; set; }
+		public string S { get; set; }
+		public List<int> Array { get; set; }
+		public override bool Equals(object obj)
+		{
+			if (obj == null || GetType() != obj.GetType())
+			{
+				return false;
+			}
+			Obj o = obj as Obj;
+			return N == o.N
+				&& S == o.S
+				&& (Array == null || Array.ContentEquals(o.Array));
+		}
+
+		public override int GetHashCode()
+		{
+			return base.GetHashCode();
 		}
 	}
 }

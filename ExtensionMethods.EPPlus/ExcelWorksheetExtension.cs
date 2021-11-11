@@ -20,33 +20,34 @@ namespace ExtensionMethods.EPPlus
 		{
 			if (worksheet.Dimension == null)
 			{
-				return new DataTable();
+				return new DataTable(worksheet.Name);
 			}
 			//获取worksheet的行数
 			int rows = worksheet.Dimension.End.Row;
 			//获取worksheet的列数
 			int cols = worksheet.Dimension.End.Column;
 			DataTable dt = new DataTable(worksheet.Name);
-			for (int i = 1; i <= rows; i++)
+			int dataStart = 1;
+
+			if (firstIsHead)
+			{
+				//将第一行设置为datatable的标题
+				for (int j = 1; j <= cols; j++)
+					dt.Columns.Add(new DataColumn(worksheet.Cells[1, j].Value.ToString(), worksheet.Cells[2, j].Value.GetType()));
+				dataStart = 2;
+			}
+			else
+			{
+				for (int j = 1; j <= cols; j++)
+					dt.Columns.Add();
+			}
+
+			for (int i = dataStart; i <= rows; i++)
 			{
 				DataRow row = dt.Rows.Add();
 				for (int j = 1; j <= cols; j++)
 				{
-					if (firstIsHead)
-					{
-						//将第一行设置为datatable的标题
-						if (i == 1)
-							dt.Columns.Add(worksheet.Cells[i, j].Value.ToString());
-						//剩下的写入datatable
-						else
-							row[j - 1] = worksheet.Cells[i, j].Value;
-					}
-					else
-					{
-						if (i == 1)
-							dt.Columns.Add();
-						row[j] = worksheet.Cells[i, j].Value;
-					}
+					row[j - 1] = worksheet.Cells[i, j].Value;
 				}
 			}
 			return dt;

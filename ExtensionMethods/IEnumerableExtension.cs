@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ExtensionMethods
 {
@@ -39,7 +40,34 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static bool Belong<TSource>(this System.Collections.Generic.IEnumerable<TSource> smallSet, System.Collections.Generic.IEnumerable<TSource> bigSet, bool canEqual = true)
 		{
-			return smallSet.All(x => bigSet.Contains(x)) && (canEqual || (!canEqual && bigSet.Any(x => !smallSet.Contains(x))));
+			return smallSet.All(x => bigSet.Contains(x)) && (canEqual || bigSet.Any(x => !smallSet.Contains(x)));
+		}
+		/// <summary>
+		/// 两个IEnumerable对象内的成员相同(包括顺序与值)
+		/// </summary>
+		/// <param name="obj1"></param>
+		/// <param name="obj"></param>
+		/// <returns></returns>
+		public static bool ContentEquals(this System.Collections.IEnumerable obj1, System.Collections.IEnumerable obj)
+		{
+			var x = obj1.GetEnumerator();
+			var y = obj.GetEnumerator();
+			while (true)
+			{
+				bool hasNextX = x.MoveNext();
+				bool hasNextY = y.MoveNext();
+				if (!hasNextX || !hasNextY)
+					return hasNextX == hasNextY;
+				Type typeX = x.Current.GetType();
+				Type typeY = y.Current.GetType();
+				if (!typeX.Equals(typeY))
+					return false;
+				if (typeof(System.Collections.IEnumerable).IsAssignableFrom(typeX))
+					if (!ContentEquals(x.Current as System.Collections.IEnumerable, y.Current as System.Collections.IEnumerable))
+						return false;
+				if (!x.Current.Equals(y.Current))
+					return false;
+			}
 		}
 	}
 }

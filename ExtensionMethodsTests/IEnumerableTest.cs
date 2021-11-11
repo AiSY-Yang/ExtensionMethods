@@ -1,5 +1,6 @@
 ﻿using ExtensionMethods;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +28,11 @@ namespace ExtensionMethodsTests
 			Assert.Equal("left2", result[1].value1);
 			Assert.Null(result[1].value2);
 			Assert.Equal("left2", result[1].value3);
+			Dictionary<int, int> a = new Dictionary<int, int>();
+			Dictionary<int, int> b = new Dictionary<int, int>();
+			a.Add(1, 1);
+			a.Add(2, 2);
+			b.Add(1, 1);
 		}
 		[Fact]
 		public void Pageing()
@@ -123,11 +129,45 @@ namespace ExtensionMethodsTests
 			List<int> big2 = new List<int>() { 2, 3, 4, 5 };
 			Assert.True(small.Belong(big1));
 			Assert.True(small.Belong(big1, false));
-			//Assert.True(false); //this is a bug for test framework
 			Assert.False(small.Belong(big2));
 			Assert.False(small.Belong(big2, false));
 			Assert.True(small.Belong(small));
 			Assert.False(small.Belong(small, false));
+		}
+		[Fact]
+		public void ContentEquals()
+		{
+			List<int> l1 = new List<int>() { 1, 2, 3 };
+			List<int> l2 = new List<int>() { 1, 2, 3 };
+			List<int> l3 = new List<int>() { 1, 2, 3, 4 };
+			Assert.True(l1.ContentEquals(l2));
+			Assert.False(l1.ContentEquals(l3));
+			List<object> list1 = new List<object>() { 1, new List<int> { 2, 3 }, "string" };
+			List<object> list2 = new List<object>() { 1, new List<int> { 2 }, "string" };
+			List<object> list3 = new List<object>() { 1, new List<int> { 2, 3 }, "string1" };
+			List<object> list4 = new List<object>() { 1, new List<int> { 2, 3 }, "string1", new int[] { 1 } };
+			List<object> list5 = new List<object>() { 1, new List<int> { 2, 3 }, "string1", new int[] { 1, 2 } };
+			List<object> list6 = new List<object>() { "a", new List<int> { 2, 3 }, "string1", new int[] { 1, 2 } };
+
+			Assert.True(list1.ContentEquals(list1));
+
+			Assert.False(list1.ContentEquals(list2));
+			Assert.False(list1.ContentEquals(list3));
+			Assert.False(list1.ContentEquals(list4));
+			Assert.False(list1.ContentEquals(list5));
+			Assert.False(list1.ContentEquals(list6));
+			Assert.False(list2.ContentEquals(list3));
+			Assert.False(list2.ContentEquals(list4));
+			Assert.False(list2.ContentEquals(list5));
+			Assert.False(list2.ContentEquals(list6));
+			Assert.False(list3.ContentEquals(list4));
+			Assert.False(list3.ContentEquals(list5));
+			Assert.False(list3.ContentEquals(list6));
+			Assert.False(list4.ContentEquals(list5));
+			Assert.False(list4.ContentEquals(list6));
+			Assert.False(list5.ContentEquals(list6));
+
+			Assert.True(list5.ContentEquals(list5));
 		}
 	}
 }
