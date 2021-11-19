@@ -15,6 +15,7 @@
     <OutputPath>..\Output\</OutputPath>
     <DocumentationFile>..\Output\ExtensionMethods.AspNetCore.xml</DocumentationFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/AiSY-Yang/ExtensionMethods</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>

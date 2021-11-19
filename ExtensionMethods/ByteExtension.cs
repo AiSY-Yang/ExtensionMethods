@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks.Dataflow;
-
-namespace ExtensionMethods
+﻿namespace ExtensionMethods
 {
 	/// <summary>
 	/// <c>byte</c>和<c>byte[]</c>的相关扩展

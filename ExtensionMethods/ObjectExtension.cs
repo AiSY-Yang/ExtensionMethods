@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Data;
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
 using System.Text.Json;
-#endif
 
 namespace ExtensionMethods
 {
@@ -18,31 +16,19 @@ namespace ExtensionMethods
 			JsonSerializerStandardOptions = new System.Text.Json.JsonSerializerOptions
 			{
 				//WriteIndented = true,
-#if NET5_0
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 				IncludeFields = true,
 #endif
 				Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
 			};
 			JsonSerializerStandardOptions.Converters.Add(jsonConverterForType);
 
-			//忽略循环序列化
-			JsonSerializerStandardOptionsWithNoCycle = new System.Text.Json.JsonSerializerOptions
-			{
-				//WriteIndented = true,
-#if NET5_0
-				IncludeFields = true,
-				ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
-#endif
-				Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
-			};
-			JsonSerializerStandardOptionsWithNoCycle.Converters.Add(jsonConverterForType);
-
 			//带时间格式的序列化
 			JsonSerializerStandardOptionsWithCommonTimeFormat = new System.Text.Json.JsonSerializerOptions
 			{
 				//WriteIndented = true,
 
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 				IncludeFields = true,
 #endif
 				Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Create(System.Text.Unicode.UnicodeRanges.All),
@@ -72,7 +58,6 @@ namespace ExtensionMethods
 			return s;
 		}
 		#region Json
-
 		/// <summary>
 		/// 转换为json
 		/// </summary>
@@ -102,7 +87,7 @@ namespace ExtensionMethods
 		{
 			return Newtonsoft.Json.JsonConvert.SerializeObject(_object, new Newtonsoft.Json.Converters.IsoDateTimeConverter() { DateTimeFormat = timeFormat });
 		}
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 		#region JsonConverter
 		/// <summary>
 		/// Json日期转换器,格式为<code>yyyy-MM-dd HH:mm:ss</code>
@@ -165,19 +150,6 @@ namespace ExtensionMethods
 		public static string ToJson(this object _object)
 		{
 			return System.Text.Json.JsonSerializer.Serialize(_object, JsonSerializerStandardOptions);
-		}
-		/// <summary>
-		/// 缓存的忽略循环序列化选项,文字不进行编码,
-		/// </summary>
-		private static System.Text.Json.JsonSerializerOptions JsonSerializerStandardOptionsWithNoCycle { get; set; }
-		/// <summary>
-		/// 采用System.Text.Json实现,效率更高,忽略循环引用对象 会导致添加$type信息
-		/// </summary>
-		/// <param name="_object"></param>
-		/// <returns></returns>
-		public static string ToJsonNoCycle(this object _object)
-		{
-			return System.Text.Json.JsonSerializer.Serialize(_object, JsonSerializerStandardOptionsWithNoCycle);
 		}
 		/// <summary>
 		/// 缓存的标准序列化选项,在第一次调用的时候初始化,文字不进行编码,指定时间格式

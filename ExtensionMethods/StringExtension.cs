@@ -483,7 +483,7 @@ namespace ExtensionMethods
 		{
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
 		}
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
+#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 		/// <summary>
 		/// 反序列化选项
 		/// </summary>
@@ -491,7 +491,7 @@ namespace ExtensionMethods
 		{
 			//允许注释
 			ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 			//允许带引号的数字
 			NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
 #endif
