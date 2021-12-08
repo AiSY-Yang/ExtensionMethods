@@ -18,7 +18,7 @@ namespace ExtensionMethodsTests.EPPlus
 		{
 			ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 		}
-
+#if !DEBUG
 		[Fact]
 		public void InsertExcel()
 		{
@@ -87,5 +87,6 @@ namespace ExtensionMethodsTests.EPPlus
 			Assert.Equal(totalRow, excelPackage.Workbook.Worksheets[4].Cells[(int)totalRow + 1 - 1048575, 1].Value);
 			Assert.Null(excelPackage.Workbook.Worksheets[4].Cells[(int)totalRow + 2 - 1048575, 1].Value);
 		}
+#endif
 	}
 }

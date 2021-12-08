@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 namespace ExtensionMethods
 {
@@ -9,6 +8,19 @@ namespace ExtensionMethods
 	/// </summary>
 	public static class IEnumerableExtension
 	{
+		/// <summary>
+		/// 符合条件之后再查询
+		/// </summary>
+		/// <inheritdoc cref="System.Linq.Enumerable.Where{TSource}(System.Collections.Generic.IEnumerable{TSource}, Func{TSource, bool})"/>
+		/// <typeparam name="TSource"></typeparam>
+		/// <param name="sources">源对象</param>
+		/// <param name="condition">条件</param>
+		/// <param name="expression">查询表达式</param>
+		/// <returns></returns>
+		public static System.Collections.Generic.IEnumerable<TSource> Where<TSource>(this System.Collections.Generic.IEnumerable<TSource> sources, bool condition, Func<TSource, bool> expression)
+		{
+			return condition ? sources.Where(expression) : sources;
+		}
 		/// <summary>
 		/// 左外连接
 		/// </summary>

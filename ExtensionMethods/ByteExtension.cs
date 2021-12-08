@@ -26,6 +26,7 @@
 		/// <returns></returns>
 		public static string ToBase64String(this byte[] _byte) => System.Convert.ToBase64String(_byte);
 
+#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 		/// <summary>
 		/// 计算CRC校验码
 		/// </summary>
@@ -134,6 +135,8 @@
 
 		}
 	}
+#endif
+#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 	/// <summary>
 	/// CRC类别
 	/// </summary>
@@ -215,4 +218,5 @@
 		/// </summary>
 		HmacSHA512_Base64,
 	}
+#endif
 }

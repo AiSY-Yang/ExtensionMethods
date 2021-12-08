@@ -38,7 +38,12 @@ namespace ExtensionMethodsTests
 			JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions()
 			{
 				Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0 || NETCOREAPP3_1 || NET5_0
 				IgnoreNullValues = true,
+#endif
+#if NET6_0_OR_GREATER
+				DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+#endif
 			};
 			Assert.Equal(@"{""Int"":1,""Double"":1.23,""DateTime"":""2006-01-02T15:04:05"",""Class"":{""P1"":""Upper"",""p2"":""lower"",""P3"":""中文""},""String"":""string""}", obj.ToJson(jsonSerializerOptions));
 		}

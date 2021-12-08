@@ -155,9 +155,9 @@ namespace ExtensionMethods
 				case EncryptOption.DES_CBC_PKCS7:
 				case EncryptOption.DES_CBC_Zeros:
 				case EncryptOption.DES_CBC_ANSIX923:
-					using (System.Security.Cryptography.DESCryptoServiceProvider des = new System.Security.Cryptography.DESCryptoServiceProvider
+					using (var des = System.Security.Cryptography.DES.Create())
 					{
-						Mode = encryptOption.ToString()[4..7] switch
+						des.Mode = encryptOption.ToString()[4..7] switch
 						{
 							"CBC" => System.Security.Cryptography.CipherMode.CBC,
 							"ECB" => System.Security.Cryptography.CipherMode.ECB,
@@ -165,8 +165,8 @@ namespace ExtensionMethods
 							"CFB" => System.Security.Cryptography.CipherMode.CFB,
 							"CTS" => System.Security.Cryptography.CipherMode.CTS,
 							_ => throw new ArgumentException("加密模式枚举值不存在"),
-						},
-						Padding = encryptOption.ToString()[8..] switch
+						};
+						des.Padding = encryptOption.ToString()[8..] switch
 						{
 							"None" => System.Security.Cryptography.PaddingMode.None,
 							"PKCS7" => System.Security.Cryptography.PaddingMode.PKCS7,
@@ -174,9 +174,7 @@ namespace ExtensionMethods
 							"ANSIX923" => System.Security.Cryptography.PaddingMode.ANSIX923,
 							"ISO10126" => System.Security.Cryptography.PaddingMode.ISO10126,
 							_ => throw new ArgumentException("填充模式枚举值不存在"),
-						}
-					})
-					{
+						};
 						if (!string.IsNullOrEmpty(secret))
 						{
 							des.Key = Encoding.UTF8.GetBytes(secret);
@@ -218,9 +216,9 @@ namespace ExtensionMethods
 				case EncryptOption.DES_CBC_PKCS7:
 				case EncryptOption.DES_CBC_Zeros:
 				case EncryptOption.DES_CBC_ANSIX923:
-					using (System.Security.Cryptography.DESCryptoServiceProvider des = new System.Security.Cryptography.DESCryptoServiceProvider
+					using (var des = System.Security.Cryptography.DES.Create())
 					{
-						Mode = decryptOption.ToString()[4..7] switch
+						des.Mode = decryptOption.ToString()[4..7] switch
 						{
 							"CBC" => System.Security.Cryptography.CipherMode.CBC,
 							"ECB" => System.Security.Cryptography.CipherMode.ECB,
@@ -228,8 +226,8 @@ namespace ExtensionMethods
 							"CFB" => System.Security.Cryptography.CipherMode.CFB,
 							"CTS" => System.Security.Cryptography.CipherMode.CTS,
 							_ => throw new ArgumentException("加密模式枚举值不存在"),
-						},
-						Padding = decryptOption.ToString()[8..] switch
+						};
+						des.Padding = decryptOption.ToString()[8..] switch
 						{
 							"None" => System.Security.Cryptography.PaddingMode.None,
 							"PKCS7" => System.Security.Cryptography.PaddingMode.PKCS7,
@@ -237,9 +235,7 @@ namespace ExtensionMethods
 							"ANSIX923" => System.Security.Cryptography.PaddingMode.ANSIX923,
 							"ISO10126" => System.Security.Cryptography.PaddingMode.ISO10126,
 							_ => throw new ArgumentException("填充模式枚举值不存在"),
-						}
-					})
-					{
+						};
 						if (!string.IsNullOrEmpty(secret))
 						{
 							des.Key = Encoding.UTF8.GetBytes(secret);

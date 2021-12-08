@@ -11,6 +11,14 @@ namespace ExtensionMethodsTests
 	public class IEnumerableTest
 	{
 		[Fact]
+		public void Where()
+		{
+			List<int> list = new List<int>() { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+			Assert.Equal(5, list.Where(x => x > 5).Count());
+			Assert.Equal(5, list.Where(true, x => x > 5).Count());
+			Assert.Equal(10, list.Where(false, x => x > 5).Count());
+		}
+		[Fact]
 		public void LeftJoin()
 		{
 			Dictionary<int, string> left = new Dictionary<int, string>();
