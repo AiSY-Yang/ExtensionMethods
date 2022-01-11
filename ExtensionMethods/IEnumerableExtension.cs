@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ExtensionMethods
 {
@@ -11,22 +10,22 @@ namespace ExtensionMethods
 		/// <summary>
 		/// 符合条件之后再查询
 		/// </summary>
-		/// <inheritdoc cref="System.Linq.Enumerable.Where{TSource}(System.Collections.Generic.IEnumerable{TSource}, Func{TSource, bool})"/>
+		/// <inheritdoc cref="System.Linq.Enumerable.Where{TSource}(System.Collections.Generic.IEnumerable{TSource}, System.Func{TSource, bool})"/>
 		/// <typeparam name="TSource"></typeparam>
 		/// <param name="sources">源对象</param>
 		/// <param name="condition">条件</param>
 		/// <param name="expression">查询表达式</param>
 		/// <returns></returns>
-		public static System.Collections.Generic.IEnumerable<TSource> Where<TSource>(this System.Collections.Generic.IEnumerable<TSource> sources, bool condition, Func<TSource, bool> expression)
+		public static System.Collections.Generic.IEnumerable<TSource> Where<TSource>(this System.Collections.Generic.IEnumerable<TSource> sources, bool condition, System.Func<TSource, bool> expression)
 		{
 			return condition ? sources.Where(expression) : sources;
 		}
 		/// <summary>
 		/// 左外连接
 		/// </summary>
-		/// <inheritdoc cref="System.Linq.Enumerable.Join{TOuter, TInner, TKey, TResult}(System.Collections.Generic.IEnumerable{TOuter}, System.Collections.Generic.IEnumerable{TInner}, Func{TOuter, TKey}, Func{TInner, TKey}, Func{TOuter, TInner, TResult})"/>
+		/// <inheritdoc cref="System.Linq.Enumerable.Join{TOuter, TInner, TKey, TResult}(System.Collections.Generic.IEnumerable{TOuter}, System.Collections.Generic.IEnumerable{TInner}, System.Func{TOuter, TKey}, System.Func{TInner, TKey}, System.Func{TOuter, TInner, TResult})"/>
 		/// <returns></returns>
-		public static System.Collections.Generic.IEnumerable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this System.Collections.Generic.IEnumerable<TOuter> outer, System.Collections.Generic.IEnumerable<TInner> inner, Func<TOuter, TKey> outerKeySelector, Func<TInner, TKey> innerKeySelector, Func<TOuter, TInner, TResult> resultSelector)
+		public static System.Collections.Generic.IEnumerable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this System.Collections.Generic.IEnumerable<TOuter> outer, System.Collections.Generic.IEnumerable<TInner> inner, System.Func<TOuter, TKey> outerKeySelector, System.Func<TInner, TKey> innerKeySelector, System.Func<TOuter, TInner, TResult> resultSelector)
 		{
 			return outer.GroupJoin(inner, outerKeySelector, innerKeySelector, (x, y) => new { x, y }).SelectMany(a => a.y.DefaultIfEmpty(), (a, b) => resultSelector(a.x, b));
 		}
@@ -70,8 +69,8 @@ namespace ExtensionMethods
 				bool hasNextY = y.MoveNext();
 				if (!hasNextX || !hasNextY)
 					return hasNextX == hasNextY;
-				Type typeX = x.Current.GetType();
-				Type typeY = y.Current.GetType();
+				System.Type typeX = x.Current.GetType();
+				System.Type typeY = y.Current.GetType();
 				if (!typeX.Equals(typeY))
 					return false;
 				if (typeof(System.Collections.IEnumerable).IsAssignableFrom(typeX))

@@ -36,6 +36,7 @@ namespace ExtensionMethods
 			JsonSerializerStandardOptionsWithCommonTimeFormat.Converters.Add(jsonConverterForType);
 			JsonSerializerStandardOptionsWithCommonTimeFormat.Converters.Add(new JsonConverterDateTimeStandard());
 		}
+#if DEBUG
 		/// <summary>
 		/// 输出所有属性和字段
 		/// </summary>
@@ -57,6 +58,7 @@ namespace ExtensionMethods
 			}
 			return s;
 		}
+#endif
 		#region Json
 		/// <summary>
 		/// 转换为json
@@ -87,7 +89,7 @@ namespace ExtensionMethods
 		{
 			return Newtonsoft.Json.JsonConvert.SerializeObject(_object, new Newtonsoft.Json.Converters.IsoDateTimeConverter() { DateTimeFormat = timeFormat });
 		}
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
 		#region JsonConverter
 		/// <summary>
 		/// Json日期转换器,格式为<code>yyyy-MM-dd HH:mm:ss</code>

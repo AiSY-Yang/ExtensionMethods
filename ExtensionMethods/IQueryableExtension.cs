@@ -48,7 +48,7 @@ namespace ExtensionMethods
 		/// <exception cref="ArgumentException">排序字段为空或不存在排序字段</exception>
 		public static IQueryable<TSource> AutoOrder<TSource>(this IQueryable<TSource> source, string sortMethod, string sortField)
 		{
-			return sortMethod.ToLower() switch
+			return sortMethod.IsNullOrWhiteSpace() ? source : sortMethod.ToLower() switch
 			{
 				"asc" => source.OrderBy(sortField),
 				"desc" => source.OrderByDescending(sortField),

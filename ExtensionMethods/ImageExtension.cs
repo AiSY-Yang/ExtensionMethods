@@ -7,6 +7,9 @@ namespace ExtensionMethods
 	/// <summary>
 	/// Image扩展
 	/// </summary>
+#if NET5_0_OR_GREATER
+	[System.Runtime.Versioning.SupportedOSPlatform("windows")]
+#endif
 	public static class ImageExtension
 	{
 

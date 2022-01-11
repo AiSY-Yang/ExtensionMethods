@@ -15,7 +15,12 @@ namespace ExtensionMethodsTests
 		{
 			Dictionary<int, string> dic = new Dictionary<int, string>() { { 1, "C" }, { 3, "A" }, { 2, "B" } };
 
-			var result = dic.AsQueryable().AutoOrder("", "Key").ToList();
+			var result = dic.AsQueryable().AutoOrder(null, "Key").ToList();
+			Assert.Equal(3, result.Count);
+			Assert.Equal(1, result.First().Key);
+			Assert.Equal(2, result.Last().Key);
+
+			result = dic.AsQueryable().AutoOrder("", "Key").ToList();
 			Assert.Equal(3, result.Count);
 			Assert.Equal(1, result.First().Key);
 			Assert.Equal(2, result.Last().Key);

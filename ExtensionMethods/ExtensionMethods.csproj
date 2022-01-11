@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
-		<Version>1.0.3</Version>
+		<Version>1.0.4</Version>
 		<RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
 		<Authors>AiSY-Yang</Authors>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -11,9 +11,8 @@
 			集合了部分常用扩展函数
 			最小依赖项
 			减少 using 方便直接源代码复制使用或者测试
-			100%包含注释
-			测试覆盖率 60%
-			方便写程序的同时兼顾性能
+			不建议滥用扩展方法
+			只用到少量方法建议到代码库中直接复制相关代码
 		</Description>
 		<RepositoryUrl>https://github.com/AiSY-Yang/ExtensionMethods</RepositoryUrl>
 		<PackageId>AiSY-Yang.ExtensionMethods</PackageId>
@@ -29,7 +28,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
-		<PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
 	</ItemGroup>
 
 	<ItemGroup Condition="$(TargetFramework)=='netstandard2.1'">

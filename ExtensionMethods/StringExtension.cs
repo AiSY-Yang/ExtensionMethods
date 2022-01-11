@@ -129,10 +129,10 @@ namespace ExtensionMethods
 		{
 			return Encoding.UTF8.GetBytes(_string).CRC(crcOption);
 		}
-		///<inheritdoc cref="ByteExtension.Hash(byte[], HashOption, string)"/>
+		///<inheritdoc cref="ByteExtension.Hash(byte[], HashOption, byte[])"/>
 		public static string Hash(this string _string, HashOption hashOption, string secret = null)
 		{
-			return Encoding.UTF8.GetBytes(_string).Hash(hashOption, secret);
+			return Encoding.UTF8.GetBytes(_string).Hash(hashOption, secret?.ToByteArray()).ToHexString();
 		}
 		/// <summary>
 		/// 字符串加密

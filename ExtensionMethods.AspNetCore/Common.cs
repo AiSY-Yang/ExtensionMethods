@@ -12,11 +12,9 @@
 		/// <returns></returns>
 		public static string GetMIME(string Name)
 		{
-			if (System.IO.File.Exists(Name))
-			{
-				Name = System.IO.Path.GetExtension(Name).Remove(0, 1);
-			}
-			return MIME.ContainsKey(Name) ? MIME[Name] : "application/octet-stream";
+			var extensionName = System.IO.Path.GetExtension(Name);
+			extensionName = extensionName == "" ? Name : extensionName.Remove(0, 1);
+			return MIME.ContainsKey(extensionName) ? MIME[extensionName] : "application/octet-stream";
 		}
 
 		private static readonly System.Collections.Generic.Dictionary<string, string> MIME = new System.Collections.Generic.Dictionary<string, string>
