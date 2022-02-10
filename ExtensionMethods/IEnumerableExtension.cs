@@ -16,19 +16,21 @@ namespace ExtensionMethods
 		/// <param name="condition">条件</param>
 		/// <param name="expression">查询表达式</param>
 		/// <returns></returns>
-		public static System.Collections.Generic.IEnumerable<TSource> Where<TSource>(this System.Collections.Generic.IEnumerable<TSource> sources, bool condition, System.Func<TSource, bool> expression)
-		{
-			return condition ? sources.Where(expression) : sources;
-		}
+		public static System.Collections.Generic.IEnumerable<TSource> Where<TSource>(this System.Collections.Generic.IEnumerable<TSource> sources,
+			bool condition,
+			System.Func<TSource, bool> expression) => condition ? sources.Where(expression) : sources;
+
 		/// <summary>
 		/// 左外连接
 		/// </summary>
-		/// <inheritdoc cref="System.Linq.Enumerable.Join{TOuter, TInner, TKey, TResult}(System.Collections.Generic.IEnumerable{TOuter}, System.Collections.Generic.IEnumerable{TInner}, System.Func{TOuter, TKey}, System.Func{TInner, TKey}, System.Func{TOuter, TInner, TResult})"/>
+		/// <inheritdoc cref="Enumerable.Join{TOuter, TInner, TKey, TResult}(System.Collections.Generic.IEnumerable{TOuter}, System.Collections.Generic.IEnumerable{TInner}, System.Func{TOuter, TKey}, System.Func{TInner, TKey}, System.Func{TOuter, TInner, TResult})"/>
 		/// <returns></returns>
-		public static System.Collections.Generic.IEnumerable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this System.Collections.Generic.IEnumerable<TOuter> outer, System.Collections.Generic.IEnumerable<TInner> inner, System.Func<TOuter, TKey> outerKeySelector, System.Func<TInner, TKey> innerKeySelector, System.Func<TOuter, TInner, TResult> resultSelector)
-		{
-			return outer.GroupJoin(inner, outerKeySelector, innerKeySelector, (x, y) => new { x, y }).SelectMany(a => a.y.DefaultIfEmpty(), (a, b) => resultSelector(a.x, b));
-		}
+		public static System.Collections.Generic.IEnumerable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(this System.Collections.Generic.IEnumerable<TOuter> outer,
+			System.Collections.Generic.IEnumerable<TInner> inner,
+			System.Func<TOuter, TKey> outerKeySelector,
+			System.Func<TInner, TKey> innerKeySelector,
+			System.Func<TOuter, TInner, TResult> resultSelector)
+			=> outer.GroupJoin(inner, outerKeySelector, innerKeySelector, (x, y) => new { x, y }).SelectMany(a => a.y.DefaultIfEmpty(), (a, b) => resultSelector(a.x, b));
 		/// <summary>
 		/// 分页 页码&lt;=0时返回第一页 页尺寸&lt;=0时不进行分页
 		/// </summary>
@@ -37,10 +39,10 @@ namespace ExtensionMethods
 		/// <param name="page">The page of return, return first page when page less 1</param>
 		/// <param name="pageSize">pageSize</param>
 		/// <returns></returns>
-		public static System.Collections.Generic.IEnumerable<TSource> Pageing<TSource>(this System.Collections.Generic.IEnumerable<TSource> source, int page, int pageSize)
-		{
-			return pageSize < 1 ? source : source.Skip(pageSize * (page < 0 ? 0 : page - 1)).Take(pageSize);
-		}
+		public static System.Collections.Generic.IEnumerable<TSource> Pageing<TSource>(this System.Collections.Generic.IEnumerable<TSource> source,
+			int page,
+			int pageSize) => pageSize < 1 ? source : source.Skip(pageSize * (page < 0 ? 0 : page - 1)).Take(pageSize);
+
 		/// <summary>
 		/// 集合属于另一个集合
 		/// </summary>
@@ -49,10 +51,10 @@ namespace ExtensionMethods
 		/// <param name="bigSet">大的集合</param>
 		/// <param name="canEqual">是否可以两个集合相同</param>
 		/// <returns></returns>
-		public static bool Belong<TSource>(this System.Collections.Generic.IEnumerable<TSource> smallSet, System.Collections.Generic.IEnumerable<TSource> bigSet, bool canEqual = true)
-		{
-			return smallSet.All(x => bigSet.Contains(x)) && (canEqual || bigSet.Any(x => !smallSet.Contains(x)));
-		}
+		public static bool Belong<TSource>(this System.Collections.Generic.IEnumerable<TSource> smallSet,
+			System.Collections.Generic.IEnumerable<TSource> bigSet,
+			bool canEqual = true) => smallSet.All(x => bigSet.Contains(x)) && (canEqual || bigSet.Any(x => !smallSet.Contains(x)));
+
 		/// <summary>
 		/// 两个IEnumerable对象内的成员相同(包括顺序与值)
 		/// </summary>

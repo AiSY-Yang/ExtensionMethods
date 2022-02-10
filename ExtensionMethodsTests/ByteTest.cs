@@ -7,6 +7,10 @@ namespace ExtensionMethodsTests
 {
 	public class ByteTest
 	{
+		public ByteTest()
+		{
+		}
+
 		[Fact]
 		public void ToUtf8String()
 		{

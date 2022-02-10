@@ -17,17 +17,7 @@ namespace ExtensionMethods
 		/// <param name="_string"></param>
 		/// <param name="startstr">开始字符串</param>
 		/// <returns></returns>
-		public static string TrimStart(this string _string, string startstr)
-		{
-			if (_string.StartsWith(startstr))
-			{
-				return _string.Remove(0, startstr.Length);
-			}
-			else
-			{
-				return _string;
-			}
-		}
+		public static string TrimStart(this string _string, string startstr) => _string.StartsWith(startstr) ? _string[startstr.Length..] : _string;
 
 		/// <summary>
 		/// 移除末尾指定字符串
@@ -35,31 +25,16 @@ namespace ExtensionMethods
 		/// <param name="_string"></param>
 		/// <param name="endstr">末尾字符串</param>
 		/// <returns></returns>
-		public static string TrimEnd(this string _string, string endstr)
-		{
-			if (string.IsNullOrEmpty(endstr))
-			{
-				return _string;
-			}
-			if (_string.EndsWith(endstr))
-			{
-				return _string.Remove(_string.Length - endstr.Length);
-			}
-			else
-			{
-				return _string;
-			}
-		}
+		public static string TrimEnd(this string _string, string endstr) => _string.EndsWith(endstr) ? _string[..(_string.Length - endstr.Length)] : _string;
+
 		/// <summary>
 		/// 重复字符串
 		/// </summary>
 		/// <param name="_string"></param>
 		/// <param name="repeatCount">重复次数</param>
 		/// <returns></returns>
-		public static string Repeat(this string _string, int repeatCount)
-		{
-			return string.Concat(Enumerable.Repeat(_string, repeatCount));
-		}
+		public static string Repeat(this string _string, int repeatCount) => string.Concat(Enumerable.Repeat(_string, repeatCount));
+
 		/// <summary>
 		/// 是否包含其中任意一个元素
 		/// </summary>
@@ -85,9 +60,9 @@ namespace ExtensionMethods
 			if (System.Text.RegularExpressions.Regex.IsMatch(str, @"[\u4e00-\u9fa5]"))
 			{
 				StringBuilder stringBuilder = new StringBuilder();
-				foreach (var item in str.ToCharArray())
+				foreach (var item in str)
 				{
-					if ((item >= 0x4e00 && item <= 0x9fa5))
+					if (item >= 0x4e00 && item <= 0x9fa5)
 					{
 						continue;
 					}
@@ -109,31 +84,21 @@ namespace ExtensionMethods
 		/// </summary>
 		/// <param name="inputStr"></param>
 		/// <returns></returns>
-		public static bool IsNullOrEmpty(this string inputStr)
-		{
-			return string.IsNullOrEmpty(inputStr);
-		}
+		public static bool IsNullOrEmpty(this string inputStr) => string.IsNullOrEmpty(inputStr);
+
 		/// <summary>
 		/// 判断空
 		/// </summary>
 		/// <param name="inputStr"></param>
 		/// <returns></returns>
-		public static bool IsNullOrWhiteSpace(this string inputStr)
-		{
-			return string.IsNullOrWhiteSpace(inputStr);
-		}
-
+		public static bool IsNullOrWhiteSpace(this string inputStr) => string.IsNullOrWhiteSpace(inputStr);
 
 		///<inheritdoc cref="ByteExtension.CRC(byte[], CrcOption)"/>
-		public static string CRC(this string _string, CrcOption crcOption)
-		{
-			return Encoding.UTF8.GetBytes(_string).CRC(crcOption);
-		}
+		public static string CRC(this string _string, CrcOption crcOption) => Encoding.UTF8.GetBytes(_string).CRC(crcOption);
+
 		///<inheritdoc cref="ByteExtension.Hash(byte[], HashOption, byte[])"/>
-		public static string Hash(this string _string, HashOption hashOption, string secret = null)
-		{
-			return Encoding.UTF8.GetBytes(_string).Hash(hashOption, secret?.ToByteArray()).ToHexString();
-		}
+		public static string Hash(this string _string, HashOption hashOption, string secret = null) => Encoding.UTF8.GetBytes(_string).Hash(hashOption, secret?.ToByteArray()).ToHexString();
+
 		/// <summary>
 		/// 字符串加密
 		/// </summary>
@@ -280,7 +245,6 @@ namespace ExtensionMethods
 					return (int)double.Parse(str);
 				}
 			}
-
 		}
 		/// <summary>
 		/// 转换为整型,如果为小数则截断小数部分,转换失败(NAN or overflow)则返回指定数字
@@ -322,7 +286,6 @@ namespace ExtensionMethods
 					throw new FormatException($"{str} is not a number", ex);
 				}
 			}
-
 		}
 		/// <summary>
 		/// 转换为double,转换失败(NAN or overflow)则返回指定数字
@@ -407,10 +370,8 @@ namespace ExtensionMethods
 		/// </summary>
 		/// <param name="str"></param>
 		/// <returns></returns>
-		public static byte[] ToByteArray(this string str)
-		{
-			return Encoding.UTF8.GetBytes(str);
-		}
+		public static byte[] ToByteArray(this string str) => Encoding.UTF8.GetBytes(str);
+
 		/// <summary>
 		/// 转换格式
 		/// </summary>
@@ -458,7 +419,6 @@ namespace ExtensionMethods
 
 
 		#region Json
-
 		/// <summary>
 		/// Json转换为dynamic
 		/// </summary>
@@ -479,13 +439,12 @@ namespace ExtensionMethods
 		{
 			return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
 		}
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 		/// <summary>
 		/// 反序列化选项
 		/// </summary>
 		static readonly System.Text.Json.JsonSerializerOptions JsonDeserializeOptions = new System.Text.Json.JsonSerializerOptions()
 		{
-			//允许注释
+			//允许并跳过注释
 			ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip,
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 			//允许带引号的数字
@@ -500,10 +459,16 @@ namespace ExtensionMethods
 		/// <typeparam name="T"></typeparam>
 		/// <param name="json"></param>
 		/// <returns></returns>
-		public static T AsJsonToObject<T>(this string json)
-		{
-			return System.Text.Json.JsonSerializer.Deserialize<T>(json, JsonDeserializeOptions);
-		}
+		public static T AsJsonToObject<T>(this string json) => System.Text.Json.JsonSerializer.Deserialize<T>(json, JsonDeserializeOptions);
+		/// <summary>
+		/// 把字符串当作json转换到指定类型
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="json"></param>
+		/// <param name="jsonSerializerOptions">反序列化选项</param>
+		/// <returns></returns>
+		public static T AsJsonToObject<T>(this string json, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) => System.Text.Json.JsonSerializer.Deserialize<T>(json, jsonSerializerOptions);
+
 		/// <summary>
 		/// 把字符串当作json转换为类定义字符串,保留大小写,对象为嵌套类且属性已进行初始化
 		/// </summary>
@@ -515,7 +480,7 @@ namespace ExtensionMethods
 			System.Text.Json.JsonElement element = _json.AsJsonToObject<System.Text.Json.JsonElement>();
 			ls.Add("public class ROOT {\r\n");
 			RecursionJsonElement(element);
-			ls.Add("\r\n}");
+			ls.Add("}");
 			void RecursionJsonElement(System.Text.Json.JsonElement element, int level = 0)
 			{
 				switch (element.ValueKind)
@@ -603,7 +568,6 @@ namespace ExtensionMethods
 			};
 			return string.Join("", ls);
 		}
-#endif
 		#endregion
 	}
 	/// <summary>

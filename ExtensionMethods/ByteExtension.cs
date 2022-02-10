@@ -1,6 +1,4 @@
 ﻿using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
 
 namespace ExtensionMethods
 {
@@ -9,6 +7,7 @@ namespace ExtensionMethods
 	/// </summary>
 	public static class ByteExtension
 	{
+		static readonly System.Text.Encoding strictUtf8 = new System.Text.UTF8Encoding(false, true);
 		/// <summary>
 		/// 转换为UTF8字符串
 		/// </summary>
@@ -35,8 +34,61 @@ namespace ExtensionMethods
 		/// <param name="_byte"></param>
 		/// <returns></returns>
 		public static string ToHexString(this byte[] _byte) => _byte.Select(x => x.ToString("x2")).Aggregate((x, y) => x + y);
+		/// <summary>
+		/// 转换为字符串,默认使用UTF-8 转换失败后使用此编码
+		/// <list type="table">
+		///		 <listheader>
+		///			 <encoding>编码</encoding>
+		///			 <desp>描述</desp>
+		///			 <head>文件头</head>
+		///		 </listheader>
+		///		 <item>
+		///			 <encoding>UTF-8</encoding>
+		///			 <desp>无顺序,可以忽略文件头</desp>
+		///			 <head>EF BB BF</head>
+		///		 </item>	
+		///		  <item>
+		///			 <encoding>UTF-16LE</encoding>
+		///			 <desp>低位在前</desp>
+		///			 <head>FF FE</head>
+		///		 </item>
+		///		  <item>
+		///			 <encoding>UTF-16BE</encoding>
+		///			 <desp>高位在前</desp>
+		///			 <head>FE  FF</head>
+		///		 </item>
+		///		  <item>
+		///			 <encoding>UTF-32LE</encoding>
+		///			 <desp>低位在前</desp>
+		///			 <head>FF FE 00 00</head>
+		///		 </item>
+		///		  <item>
+		///			 <encoding>UTF-32BE</encoding>
+		///			 <desp>高位在前</desp>
+		///			 <head>00 00 FE FF</head>
+		///		 </item>
+		///	</list>
+		/// </summary>
+		/// <param name="_byte"></param>
+		/// <param name="reserveEncoding">默认使用UTF8转换,转换失败后采用此编码进行转换</param>
+		/// <returns></returns>
+		public static string ToString(this byte[] _byte, System.Text.Encoding reserveEncoding)
+		{
+			//去掉UTF8的BOM头
+			if (_byte[0] == 0xEF && _byte[1] == 0xBB && _byte[2] == 0xBF)
+			{
+				_byte = _byte[3..];
+			}
+			try
+			{
+				return strictUtf8.GetString(_byte);
+			}
+			catch (global::System.Exception)
+			{
+				return reserveEncoding.GetString(_byte);
+			};
+		}
 
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 		/// <summary>
 		/// 计算CRC校验码
 		/// </summary>
@@ -116,8 +168,6 @@ namespace ExtensionMethods
 			}
 		}
 	}
-#endif
-#if NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 	/// <summary>
 	/// CRC类别
 	/// </summary>
@@ -179,5 +229,4 @@ namespace ExtensionMethods
 		/// </summary>
 		HmacSHA512,
 	}
-#endif
 }

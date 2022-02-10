@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Data;
-using System.Text.Json;
 
 namespace ExtensionMethods
 {
@@ -89,7 +87,6 @@ namespace ExtensionMethods
 		{
 			return Newtonsoft.Json.JsonConvert.SerializeObject(_object, new Newtonsoft.Json.Converters.IsoDateTimeConverter() { DateTimeFormat = timeFormat });
 		}
-#if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_0_OR_GREATER || NET5_0_OR_GREATER
 		#region JsonConverter
 		/// <summary>
 		/// Json日期转换器,格式为<code>yyyy-MM-dd HH:mm:ss</code>
@@ -109,11 +106,11 @@ namespace ExtensionMethods
 		/// </summary>
 		private class JsonConverterForType : System.Text.Json.Serialization.JsonConverter<Type>
 		{
-			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Read(ref Utf8JsonReader, Type, JsonSerializerOptions)"/>
+			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Read(ref System.Text.Json.Utf8JsonReader, Type, System.Text.Json.JsonSerializerOptions)"/>
 			public override Type Read(
-				ref Utf8JsonReader reader,
+				ref System.Text.Json.Utf8JsonReader reader,
 				Type typeToConvert,
-				JsonSerializerOptions options
+				System.Text.Json.JsonSerializerOptions options
 				)
 			{
 				// Caution: Deserialization of type instances like this 
@@ -126,11 +123,11 @@ namespace ExtensionMethods
 				throw new NotSupportedException();
 			}
 
-			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Write(Utf8JsonWriter, T, JsonSerializerOptions)"/>
+			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Write(System.Text.Json.Utf8JsonWriter, T, System.Text.Json.JsonSerializerOptions)"/>
 			public override void Write(
-				Utf8JsonWriter writer,
+				System.Text.Json.Utf8JsonWriter writer,
 				Type value,
-				JsonSerializerOptions options
+				System.Text.Json.JsonSerializerOptions options
 				)
 			{
 				string assemblyQualifiedName = value?.AssemblyQualifiedName;
@@ -172,12 +169,11 @@ namespace ExtensionMethods
 		/// <param name="_object"></param>
 		/// <param name="jsonSerializerOptions"></param>
 		/// <returns></returns>
-		public static string ToJson(this object _object, JsonSerializerOptions jsonSerializerOptions)
+		public static string ToJson(this object _object, System.Text.Json.JsonSerializerOptions jsonSerializerOptions)
 		{
 			return System.Text.Json.JsonSerializer.Serialize(_object, jsonSerializerOptions);
 		}
 
-#endif
 		#endregion
 #if NET5_0_OR_GREATER
 		/// <summary>

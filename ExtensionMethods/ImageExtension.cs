@@ -62,5 +62,4 @@ namespace ExtensionMethods
 			return image;
 		}
 	}
-
 }
