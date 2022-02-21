@@ -1,9 +1,12 @@
-﻿namespace ExtensionMethods
+﻿using System.Runtime.CompilerServices;
+
+
+namespace ExtensionMethods
 {
 	/// <summary>
 	/// 通用组件
 	/// </summary>
-	public static partial class Tools
+	internal static partial class Tools
 	{
 		/// <summary>
 		/// 获取MIME类型,可以传入文件名或者文件扩展名
