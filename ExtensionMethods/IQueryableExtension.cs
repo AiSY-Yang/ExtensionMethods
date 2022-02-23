@@ -96,6 +96,7 @@ namespace ExtensionMethods
 		/// <summary>
 		/// Implement Left Outer join implemented by calling GroupJoin and
 		/// SelectMany within this extension method
+		/// <br></br><a href="https://stackoverflow.com/questions/46537158/trying-to-implement-a-leftjoin-extension-method-to-work-with-ef-core-2-0/47357102#47357102"></a>
 		/// </summary>
 		/// <typeparam name="TOuter">Outer Type</typeparam>
 		/// <typeparam name="TInner">Inner Type</typeparam>
@@ -126,7 +127,7 @@ namespace ExtensionMethods
 				.SelectMany(
 					joinResult => joinResult.innerItems.DefaultIfEmpty(),
 					(joinResult, innerItem) =>
-						resultSelector.Invoke(joinResult.outerItem, innerItem));
+						resultSelector.Invoke(joinResult.outerItem, innerItem!));
 		}
 	}
 }

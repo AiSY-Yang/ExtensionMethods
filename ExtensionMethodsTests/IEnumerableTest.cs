@@ -148,6 +148,7 @@ namespace ExtensionMethodsTests
 			List<int> l1 = new List<int>() { 1, 2, 3 };
 			List<int> l2 = new List<int>() { 1, 2, 3 };
 			List<int> l3 = new List<int>() { 1, 2, 3, 4 };
+			Assert.True(l1.ToJson()==l2.ToJson());
 			Assert.True(l1.ContentEquals(l2));
 			Assert.False(l1.ContentEquals(l3));
 			List<object> list1 = new List<object>() { 1, new List<int> { 2, 3 }, "string" };
