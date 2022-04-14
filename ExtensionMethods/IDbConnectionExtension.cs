@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DustMonitorPlatform.Service
+namespace ExtensionMethods
 {
 	/// <summary>
 	/// 数据库连接,可通过begin开启事务
@@ -68,7 +68,7 @@ namespace DustMonitorPlatform.Service
 						string paramName = $"{item.Key}_{count:0000}";
 						paramNameBuilder.Append(" @");
 						paramNameBuilder.Append(paramName);
-						paramNameBuilder.Append(",");
+						paramNameBuilder.Append(',');
 						var parameter = cmd.CreateParameter();
 						parameter.ParameterName = paramName;
 						parameter.Value = enumerator.Current;

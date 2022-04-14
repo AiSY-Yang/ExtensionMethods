@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace ExtensionMethods
 {
@@ -29,7 +30,7 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static string ToBase64String(this byte[] _byte) => System.Convert.ToBase64String(_byte);
 		/// <summary>
-		/// 转换为16进制字符串
+		/// 转换为16进制小写字符串
 		/// </summary>
 		/// <param name="_byte"></param>
 		/// <returns></returns>
@@ -83,7 +84,7 @@ namespace ExtensionMethods
 			{
 				return strictUtf8.GetString(_byte);
 			}
-			catch (global::System.Exception)
+			catch (System.Exception)
 			{
 				return reserveEncoding.GetString(_byte);
 			};
@@ -129,40 +130,45 @@ namespace ExtensionMethods
 				case HashOption.MD5_16:
 					return byteArray.Hash(HashOption.MD5_32)[4..12];
 				case HashOption.MD5_32:
+					return System.Security.Cryptography.MD5.Create().ComputeHash(byteArray);
 				case HashOption.SHA1:
+					return System.Security.Cryptography.SHA1.Create().ComputeHash(byteArray);
 				case HashOption.SHA256:
+					return System.Security.Cryptography.SHA256.Create().ComputeHash(byteArray);
 				case HashOption.SHA384:
+					return System.Security.Cryptography.SHA384.Create().ComputeHash(byteArray);
 				case HashOption.SHA512:
-					byte[] hash = hashOption switch
-					{
-						HashOption.MD5_32 => System.Security.Cryptography.MD5.Create().ComputeHash(byteArray),
-						HashOption.SHA1 => System.Security.Cryptography.SHA1.Create().ComputeHash(byteArray),
-						HashOption.SHA256 => System.Security.Cryptography.SHA256.Create().ComputeHash(byteArray),
-						HashOption.SHA384 => System.Security.Cryptography.SHA384.Create().ComputeHash(byteArray),
-						HashOption.SHA512 => System.Security.Cryptography.SHA512.Create().ComputeHash(byteArray),
-						_ => throw new System.ArgumentException("枚举值不存在"),
-					};
-					return hash;
+					return System.Security.Cryptography.SHA512.Create().ComputeHash(byteArray);
 				case HashOption.HmacMD5:
+					if (secret is null)
+					{
+						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
+					}
+					return new System.Security.Cryptography.HMACMD5(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA1:
+					if (secret is null)
+					{
+						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
+					}
+					return new System.Security.Cryptography.HMACSHA1(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA256:
+					if (secret is null)
+					{
+						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
+					}
+					return new System.Security.Cryptography.HMACSHA256(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA384:
+					if (secret is null)
+					{
+						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
+					}
+					return new System.Security.Cryptography.HMACSHA384(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA512:
 					if (secret is null)
 					{
-						throw new System.ArgumentException("for Hmac algorithm,The secret is necessary");
+						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
 					}
-					System.Security.Cryptography.HMAC hMAC = hashOption switch
-					{
-						HashOption.HmacMD5 => new System.Security.Cryptography.HMACMD5(secret),
-						HashOption.HmacSHA1 => new System.Security.Cryptography.HMACSHA1(secret),
-						HashOption.HmacSHA256 => new System.Security.Cryptography.HMACSHA256(secret),
-						HashOption.HmacSHA384 => new System.Security.Cryptography.HMACSHA384(secret),
-						HashOption.HmacSHA512 => new System.Security.Cryptography.HMACSHA512(secret),
-						_ => throw new System.ArgumentException("枚举值不存在"),
-					};
-					byte[] hashmessage = hMAC.ComputeHash(byteArray);
-					return hashmessage;
+					return new System.Security.Cryptography.HMACSHA512(secret).ComputeHash(byteArray);
 				default:
 					throw new System.ArgumentException("枚举值不存在");
 			}

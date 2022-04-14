@@ -547,7 +547,14 @@ namespace ExtensionMethods
 							ls.Remove(ls[^1]);
 						break;
 					case System.Text.Json.JsonValueKind.String:
-						ls.Add($"{new string('\t', level)}public string {property.Name} {{get;set;}}\r\n");
+						if (DateTime.TryParse(property.Value.GetString(), out DateTime _))
+						{
+							ls.Add($"{new string('\t', level)}public DateTime {property.Name} {{get;set;}}\r\n");
+						}
+						else
+						{
+							ls.Add($"{new string('\t', level)}public string {property.Name} {{get;set;}}\r\n");
+						}
 						break;
 					case System.Text.Json.JsonValueKind.Number:
 						if (property.Value.ToString().Contains('.'))
