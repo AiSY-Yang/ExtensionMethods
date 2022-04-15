@@ -96,7 +96,7 @@ namespace ExtensionMethods
 		/// <param name="byteArray"></param>
 		/// <param name="crcOption"></param>
 		/// <returns></returns>
-		/// <exception cref="System.ArgumentException"></exception>
+		/// <exception cref="System.ComponentModel.InvalidEnumArgumentException"></exception>
 		public static string CRC(this byte[] byteArray, CrcOption crcOption)
 		{
 			switch (crcOption)
@@ -112,7 +112,7 @@ namespace ExtensionMethods
 					}
 					return string.Format("{0:X}", crc).PadLeft(4, '0');
 				default:
-					throw new System.ArgumentException("枚举值不存在");
+					throw new System.ComponentModel.InvalidEnumArgumentException("枚举值不存在");
 			}
 		}
 
@@ -170,7 +170,7 @@ namespace ExtensionMethods
 					}
 					return new System.Security.Cryptography.HMACSHA512(secret).ComputeHash(byteArray);
 				default:
-					throw new System.ArgumentException("枚举值不存在");
+					throw new System.ComponentModel.InvalidEnumArgumentException("枚举值不存在");
 			}
 		}
 	}

@@ -22,11 +22,12 @@ namespace ExtensionMethods
 		/// <exception cref="ArgumentOutOfRangeException"></exception>
 		public static string ToRmbUpper(this decimal price)
 		{
+			//人民币金额必须大于0且小于1兆(1亿亿)
 			if (price < 0M || price >= 9999999999999999.99M)
 			{
 				throw new ArgumentOutOfRangeException(nameof(price));
 			}
-
+			//保留两位小数
 			price = Math.Round(price, 2);
 			var sb = new StringBuilder();
 
@@ -48,7 +49,7 @@ namespace ExtensionMethods
 			//处理亿到千亿的部分
 			if (integerPart >= 100000000L && yiPart > 0)
 			{
-				var isFirstSection = integerPart >= 100000000L && integerPart < 1000000000000L;
+				var isFirstSection =integerPart < 1000000000000L;
 				zeroCount = ParseInteger(sb, yiPart, isFirstSection, zeroCount);
 				sb.Append('亿');
 			}
@@ -56,7 +57,7 @@ namespace ExtensionMethods
 			//处理万的部分
 			if (integerPart >= 10000L && wanPart > 0)
 			{
-				var isFirstSection = integerPart >= 1000L && integerPart < 10000000L;
+				var isFirstSection =  integerPart < 10000000L;
 				zeroCount = ParseInteger(sb, wanPart, isFirstSection, zeroCount);
 				sb.Append('万');
 			}
@@ -82,7 +83,7 @@ namespace ExtensionMethods
 			{
 				ParseDecimal(sb, integerPart, decPart, zeroCount);
 			}
-			else if (decPart <= 0 && integerPart > 0)
+			else if (integerPart > 0)
 			{
 				sb.Append('整');
 			}

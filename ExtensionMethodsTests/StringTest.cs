@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 using Xunit;
 
@@ -87,13 +88,13 @@ namespace ExtensionMethodsTests
 		[Fact]
 		public void CRC()
 		{
-			Assert.Throws<ArgumentException>(() => "QN=20180427125809000;ST=22;CN=2011;PW=123456;MN=LXHB0CS0306310;Flag=5;CP=&&DataTime=20180427125809;a34004-Rtd=75600.000,a34004-Flag=N;a34002-Rtd=140600.000,a34002-Flag=N;a34001-Rtd=178000.000,a34001-Flag=N;a01001-Rtd=24.8,a01001-Flag=N;a01002-Rtd=46.8,a01002-Flag=N;a01006-Rtd=101.380,a01006-Flag=N;a01007-Rtd=0.0,a01007-Flag=N;a01008-Rtd=25,a01008-Flag=N;LA-Rtd=57.9,LA-Flag=N&&".CRC((CrcOption)(-1)));
+			Assert.Throws<InvalidEnumArgumentException>(() => "QN=20180427125809000;ST=22;CN=2011;PW=123456;MN=LXHB0CS0306310;Flag=5;CP=&&DataTime=20180427125809;a34004-Rtd=75600.000,a34004-Flag=N;a34002-Rtd=140600.000,a34002-Flag=N;a34001-Rtd=178000.000,a34001-Flag=N;a01001-Rtd=24.8,a01001-Flag=N;a01002-Rtd=46.8,a01002-Flag=N;a01006-Rtd=101.380,a01006-Flag=N;a01007-Rtd=0.0,a01007-Flag=N;a01008-Rtd=25,a01008-Flag=N;LA-Rtd=57.9,LA-Flag=N&&".CRC((CrcOption)(-1)));
 			Assert.Equal("5440", "QN=20180427125809000;ST=22;CN=2011;PW=123456;MN=LXHB0CS0306310;Flag=5;CP=&&DataTime=20180427125809;a34004-Rtd=75600.000,a34004-Flag=N;a34002-Rtd=140600.000,a34002-Flag=N;a34001-Rtd=178000.000,a34001-Flag=N;a01001-Rtd=24.8,a01001-Flag=N;a01002-Rtd=46.8,a01002-Flag=N;a01006-Rtd=101.380,a01006-Flag=N;a01007-Rtd=0.0,a01007-Flag=N;a01008-Rtd=25,a01008-Flag=N;LA-Rtd=57.9,LA-Flag=N&&".CRC(CrcOption.CRC16_HJ212));
 		}
 		[Fact]
 		public void Hash()
 		{
-			Assert.Throws<ArgumentException>(() => "".Hash((HashOption)(-1)));
+			Assert.Throws<InvalidEnumArgumentException>(() => "".Hash((HashOption)(-1)));
 			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacMD5));
 			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacSHA1));
 			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacSHA256));
@@ -237,6 +238,7 @@ namespace ExtensionMethodsTests
 		[Fact]
 		public void Convert()
 		{
+			Assert.Throws<InvalidCastException>(() => "一".Convert<int>());
 			Assert.Equal(1, "1".Convert<int>());
 			Assert.Equal(1D, "1".Convert<double>());
 			Assert.Equal(1.1F, "1.1".Convert<float>());

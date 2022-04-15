@@ -9,11 +9,11 @@
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>
-			集合了部分常用扩展函数
-			最小依赖项
-			减少 using 方便直接源代码复制使用或者测试
-			不建议滥用扩展方法
-			只用到少量方法建议到代码库中直接复制相关代码
+集合了部分常用扩展函数
+最小依赖项
+减少 using 方便直接源代码复制使用或者测试
+不建议滥用扩展方法
+只用到少量方法建议到代码库中直接复制相关代码
 		</Description>
 		<RepositoryUrl>https://github.com/AiSY-Yang/ExtensionMethods</RepositoryUrl>
 		<PackageId>AiSY-Yang.ExtensionMethods</PackageId>
@@ -29,7 +29,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="LinqKit.Core" Version="1.2.1" />
-		<PackageReference Include="Newtonsoft.Json" Version="10.0.1" />
 		<PackageReference Include="System.Drawing.Common" Version="6.0.0" />
 	</ItemGroup>
 

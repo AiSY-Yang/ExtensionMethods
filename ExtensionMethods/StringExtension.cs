@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -114,51 +115,43 @@ namespace ExtensionMethods
 			{
 				throw new ArgumentException("String is null or empty");
 			}
+			using var des = System.Security.Cryptography.DES.Create();
 			switch (encryptOption)
 			{
 				case EncryptOption.DES_CBC_None:
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.None;
+					break;
 				case EncryptOption.DES_CBC_PKCS7:
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
+					break;
 				case EncryptOption.DES_CBC_Zeros:
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.Zeros;
+					break;
 				case EncryptOption.DES_CBC_ANSIX923:
-					using (var des = System.Security.Cryptography.DES.Create())
-					{
-						des.Mode = encryptOption.ToString()[4..7] switch
-						{
-							"CBC" => System.Security.Cryptography.CipherMode.CBC,
-							"ECB" => System.Security.Cryptography.CipherMode.ECB,
-							"OFB" => System.Security.Cryptography.CipherMode.OFB,
-							"CFB" => System.Security.Cryptography.CipherMode.CFB,
-							"CTS" => System.Security.Cryptography.CipherMode.CTS,
-							_ => throw new ArgumentException("加密模式枚举值不存在"),
-						};
-						des.Padding = encryptOption.ToString()[8..] switch
-						{
-							"None" => System.Security.Cryptography.PaddingMode.None,
-							"PKCS7" => System.Security.Cryptography.PaddingMode.PKCS7,
-							"Zeros" => System.Security.Cryptography.PaddingMode.Zeros,
-							"ANSIX923" => System.Security.Cryptography.PaddingMode.ANSIX923,
-							"ISO10126" => System.Security.Cryptography.PaddingMode.ISO10126,
-							_ => throw new ArgumentException("填充模式枚举值不存在"),
-						};
-						if (!string.IsNullOrEmpty(secret))
-						{
-							des.Key = Encoding.UTF8.GetBytes(secret);
-						}
-						if (!string.IsNullOrEmpty(iv))
-						{
-							des.IV = Encoding.UTF8.GetBytes(iv);
-						}
-						using System.Security.Cryptography.ICryptoTransform ct = des.CreateEncryptor();
-						byte[] by = Encoding.UTF8.GetBytes(_string);
-						using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
-						using var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write);
-						cs.Write(by, 0, by.Length);
-						cs.FlushFinalBlock();
-						return System.Convert.ToBase64String(outStream.ToArray());
-					}
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.ANSIX923;
+					break;
 				default:
-					throw new ArgumentException("枚举值不存在");
+					throw new InvalidEnumArgumentException("枚举值不存在");
 			}
+			if (!string.IsNullOrEmpty(secret))
+			{
+				des.Key = Encoding.UTF8.GetBytes(secret);
+			}
+			if (!string.IsNullOrEmpty(iv))
+			{
+				des.IV = Encoding.UTF8.GetBytes(iv);
+			}
+			using System.Security.Cryptography.ICryptoTransform ct = des.CreateEncryptor();
+			byte[] by = Encoding.UTF8.GetBytes(_string);
+			using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
+			using var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write);
+			cs.Write(by, 0, by.Length);
+			cs.FlushFinalBlock();
+			return System.Convert.ToBase64String(outStream.ToArray());
 		}
 
 		/// <summary>
@@ -175,53 +168,45 @@ namespace ExtensionMethods
 			{
 				throw new ArgumentException("String is null or empty");
 			}
+			using var des = System.Security.Cryptography.DES.Create();
 			switch (decryptOption)
 			{
 				case EncryptOption.DES_CBC_None:
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.None;
+					break;
 				case EncryptOption.DES_CBC_PKCS7:
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
+					break;
 				case EncryptOption.DES_CBC_Zeros:
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.Zeros;
+					break;
 				case EncryptOption.DES_CBC_ANSIX923:
-					using (var des = System.Security.Cryptography.DES.Create())
-					{
-						des.Mode = decryptOption.ToString()[4..7] switch
-						{
-							"CBC" => System.Security.Cryptography.CipherMode.CBC,
-							"ECB" => System.Security.Cryptography.CipherMode.ECB,
-							"OFB" => System.Security.Cryptography.CipherMode.OFB,
-							"CFB" => System.Security.Cryptography.CipherMode.CFB,
-							"CTS" => System.Security.Cryptography.CipherMode.CTS,
-							_ => throw new ArgumentException("加密模式枚举值不存在"),
-						};
-						des.Padding = decryptOption.ToString()[8..] switch
-						{
-							"None" => System.Security.Cryptography.PaddingMode.None,
-							"PKCS7" => System.Security.Cryptography.PaddingMode.PKCS7,
-							"Zeros" => System.Security.Cryptography.PaddingMode.Zeros,
-							"ANSIX923" => System.Security.Cryptography.PaddingMode.ANSIX923,
-							"ISO10126" => System.Security.Cryptography.PaddingMode.ISO10126,
-							_ => throw new ArgumentException("填充模式枚举值不存在"),
-						};
-						if (!string.IsNullOrEmpty(secret))
-						{
-							des.Key = Encoding.UTF8.GetBytes(secret);
-						}
-						if (!string.IsNullOrEmpty(iv))
-						{
-							des.IV = Encoding.UTF8.GetBytes(iv);
-						}
-						using System.Security.Cryptography.ICryptoTransform ct = des.CreateDecryptor();
-						byte[] by = System.Convert.FromBase64String(_string);
-						using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
-						using (var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write))
-						{
-							cs.Write(by, 0, by.Length);
-							cs.FlushFinalBlock();
-						}
-						return Encoding.UTF8.GetString(outStream.ToArray());
-					}
+					des.Mode = System.Security.Cryptography.CipherMode.CBC;
+					des.Padding = System.Security.Cryptography.PaddingMode.ANSIX923;
+					break;
 				default:
-					throw new ArgumentException("枚举值不存在");
+					throw new InvalidEnumArgumentException("枚举值不存在");
 			}
+			if (!string.IsNullOrEmpty(secret))
+			{
+				des.Key = Encoding.UTF8.GetBytes(secret);
+			}
+			if (!string.IsNullOrEmpty(iv))
+			{
+				des.IV = Encoding.UTF8.GetBytes(iv);
+			}
+			using System.Security.Cryptography.ICryptoTransform ct = des.CreateDecryptor();
+			byte[] by = System.Convert.FromBase64String(_string);
+			using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
+			using (var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write))
+			{
+				cs.Write(by, 0, by.Length);
+				cs.FlushFinalBlock();
+			}
+			return Encoding.UTF8.GetString(outStream.ToArray());
 		}
 		#region Convert
 		/// <summary>
@@ -378,6 +363,7 @@ namespace ExtensionMethods
 		/// <typeparam name="T"></typeparam>
 		/// <param name="str"></param>
 		/// <returns></returns>
+		/// <exception cref="InvalidCastException">转换失败</exception>
 		public static T Convert<T>(this string str)
 		{
 			var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(T));
@@ -394,7 +380,7 @@ namespace ExtensionMethods
 			}
 			catch (Exception)
 			{
-				throw new Exception("转换失败");
+				throw new InvalidCastException("转换失败");
 			}
 		}
 		/// <summary>
@@ -419,26 +405,6 @@ namespace ExtensionMethods
 
 
 		#region Json
-		/// <summary>
-		/// Json转换为dynamic
-		/// </summary>
-		/// <param name="json"></param>
-		/// <returns></returns>
-		public static dynamic UseNewtonsoftAsJsonTodynamic(this string json)
-		{
-			return Newtonsoft.Json.JsonConvert.DeserializeObject(json);
-		}
-		/// <summary>
-		/// 把字符串当作json转换到指定类型
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <param name="json"></param>
-		/// <returns></returns>
-		[Obsolete("System.Text.Json在简单序列化时性能可以提高10倍,推荐使用System.Text.Json")]
-		public static T UseNewtonsoftAsJsonToObject<T>(this string json)
-		{
-			return Newtonsoft.Json.JsonConvert.DeserializeObject<T>(json);
-		}
 		/// <summary>
 		/// 反序列化选项
 		/// </summary>
@@ -602,7 +568,7 @@ namespace ExtensionMethods
 	/// <summary>
 	/// 缓存所用到的正则表达式
 	/// </summary>
-	public static class RegexCache
+	static class RegexCache
 	{
 
 		/// <summary>
@@ -641,6 +607,5 @@ namespace ExtensionMethods
 		/// <code>yyyy</code>
 		/// </summary>
 		internal static readonly System.Text.RegularExpressions.Regex yyyy = new System.Text.RegularExpressions.Regex(@"^\d{4}$");
-
 	}
 }

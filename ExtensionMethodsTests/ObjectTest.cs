@@ -46,5 +46,11 @@ namespace ExtensionMethodsTests
 			};
 			Assert.Equal(@"{""Int"":1,""Double"":1.23,""DateTime"":""2006-01-02T15:04:05"",""Class"":{""P1"":""Upper"",""p2"":""lower"",""P3"":""中文""},""String"":""string""}", obj.ToJson(jsonSerializerOptions));
 		}
+		[Fact]
+		public void ToJsonWithCommonTimeFormat()
+		{
+			var obj = new Model();
+			Assert.Equal(@"{""Int"":1,""Double"":1.23,""DateTime"":""2006-01-02 15:04:05"",""Class"":{""P1"":""Upper"",""p2"":""lower"",""P3"":""中文""},""String"":""string"",""Null"":null}", obj.ToJsonWithCommonTimeFormat());
+		}
 	}
 }
