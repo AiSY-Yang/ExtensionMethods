@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ExtensionMethods
 {
@@ -140,37 +139,29 @@ namespace ExtensionMethods
 				case HashOption.SHA512:
 					return System.Security.Cryptography.SHA512.Create().ComputeHash(byteArray);
 				case HashOption.HmacMD5:
-					if (secret is null)
-					{
-						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
-					}
+					NullCheck();
 					return new System.Security.Cryptography.HMACMD5(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA1:
-					if (secret is null)
-					{
-						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
-					}
+					NullCheck();
 					return new System.Security.Cryptography.HMACSHA1(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA256:
-					if (secret is null)
-					{
-						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
-					}
+					NullCheck();
 					return new System.Security.Cryptography.HMACSHA256(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA384:
-					if (secret is null)
-					{
-						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
-					}
+					NullCheck();
 					return new System.Security.Cryptography.HMACSHA384(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA512:
-					if (secret is null)
-					{
-						throw new System.ArgumentNullException("for Hmac algorithm,The secret is necessary");
-					}
+					NullCheck();
 					return new System.Security.Cryptography.HMACSHA512(secret).ComputeHash(byteArray);
 				default:
 					throw new System.ComponentModel.InvalidEnumArgumentException("枚举值不存在");
+			}
+			void NullCheck()
+			{
+				if (secret is null)
+				{
+					throw new System.ArgumentNullException(nameof(secret), "for Hmac algorithm,The secret is necessary");
+				}
 			}
 		}
 	}

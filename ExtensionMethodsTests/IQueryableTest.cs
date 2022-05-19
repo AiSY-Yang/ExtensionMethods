@@ -97,11 +97,11 @@ namespace ExtensionMethodsTests
 		public void Where()
 		{
 			var result = listForWhere.Where(true,x => x % 2 == 0).ToList();
-			Assert.Equal(2, result.Count());
+			Assert.Equal(2, result.Count);
 			Assert.Equal(2, result.First());
 			Assert.Equal(4, result.Last());
 			result = listForWhere.Where(false, x => x % 2 == 0).ToList();
-			Assert.Equal(5, result.Count());
+			Assert.Equal(5, result.Count);
 			Assert.Equal(2, result.First());
 			Assert.Equal(5, result.Last());
 		}

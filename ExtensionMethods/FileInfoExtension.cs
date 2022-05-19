@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 
 namespace ExtensionMethods
 {
@@ -43,43 +44,13 @@ namespace ExtensionMethods
 			}
 		}
 		/// <summary>
-		/// 得到远程文件的长度
-		/// </summary>
-		/// <param name="url"></param>
-		/// <returns></returns>
-		public static long GetHttpLength(string url)
-		{
-			long length = 0;
-			HttpWebRequest req = null;
-			HttpWebResponse rsp = null;
-			try
-			{
-				req = (HttpWebRequest)HttpWebRequest.Create(url);
-				rsp = (HttpWebResponse)req.GetResponse();
-				if (rsp.StatusCode == HttpStatusCode.OK)
-					length = rsp.ContentLength;
-			}
-			catch (Exception)
-			{
-				throw;
-			}
-			finally
-			{
-				if (rsp != null)
-					rsp.Close();
-				if (req != null)
-					req.Abort();
-			}
-			return length;
-		}
-		/// <summary>
 		/// 从指定的网址下载文件
 		/// </summary>
 		/// <param name="f"></param>
 		/// <param name="url"></param>
 		/// <param name="cover">当文件已经存在时覆盖</param>
 		/// <returns></returns>
-		public static bool Download(this FileInfo f, string url, bool cover = true)
+		public static async System.Threading.Tasks.Task<bool> Download(this FileInfo f, string url, bool cover = true)
 		{
 			string localfileReal = f.FullName;
 			string localfileWithSuffix = localfileReal + Suffix;
@@ -87,13 +58,19 @@ namespace ExtensionMethods
 			{
 				long startPosition = 0;
 				FileStream writeStream = null;
-				if (string.IsNullOrEmpty(url) || string.IsNullOrEmpty(localfileReal))
-					return false;
+				if (string.IsNullOrEmpty(url))
+					throw new ArgumentNullException(nameof(url), "the url is null or empty");
+				if (string.IsNullOrEmpty(localfileReal))
+					throw new ArgumentNullException(nameof(f), "the FileInfo's fileName is null or empty");
 
 				//取得远程文件长度
-				long remoteFileLength = GetHttpLength(url);
+				using var client = new HttpClient();
+				var res = await client.GetAsync(url);
+				res.EnsureSuccessStatusCode();
+				long remoteFileLength = res.Content.Headers.ContentLength ?? throw new WebException("file length is null");
 				if (remoteFileLength == 0)
-					return false;
+					throw new WebException("file length is 0");
+
 				if (File.Exists(localfileReal))
 					if (cover == true)
 					{
@@ -108,7 +85,7 @@ namespace ExtensionMethods
 					{
 						writeStream.Close();
 						File.Delete(localfileWithSuffix);
-						writeStream = new FileStream(localfileWithSuffix, FileMode.Create);
+						writeStream = new FileStream(localfileWithSuffix,  FileMode.Create);
 					}
 					else if (startPosition == remoteFileLength)
 					{

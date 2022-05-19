@@ -1,13 +1,62 @@
-﻿using System.Runtime.CompilerServices;
-
+﻿using System;
+using System.Linq;
+using System.Security.Cryptography;
 
 namespace ExtensionMethods
 {
 	/// <summary>
 	/// 通用组件
 	/// </summary>
-	internal static partial class Tools
+	public static partial class Tools
 	{
+		/// <summary>
+		/// 验证码
+		/// </summary>
+		static class Captcha
+		{
+			/// <summary>
+			/// 生成随机数字
+			/// </summary>
+			/// <param name="Length">验证码长度</param>
+			/// <exception cref="ArgumentException"></exception>
+			public static string GetNumber(int Length)
+			{
+				if (Length <= 0) throw new ArgumentException("The Length must be greater than 0");
+				return RandomNumberGenerator.GetInt32((int)Math.Pow(10, Length)).ToString("0".Repeat(Length));
+			}
+			/// <summary>
+			/// 生成随机大写字符验证码
+			/// 已去掉易混淆的I和L
+			/// </summary>
+			/// <param name="Length">验证码长度</param>
+			/// <returns></returns>
+			/// <exception cref="ArgumentException"></exception>
+			public static string GetChar(int Length)
+			{
+				if (Length <= 0) throw new ArgumentException("The Length must be greater than 0");
+				var charList = new char[] { 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z' };
+				var result = new char[Length];
+				for (int i = 0; i < Length; i++)
+					result[i] = charList[RandomNumberGenerator.GetInt32(charList.Length)];
+				return new string(result);
+			}
+			/// <summary>
+			/// 生成随机大写字符和数字
+			/// 已去掉易混淆的0,o,O,1,i,I,l,L,2,z,Z,5,s,S,6,b,8,B,9,g
+			/// </summary>
+			/// <param name="Length">验证码长度</param>
+			/// <returns></returns>
+			/// <exception cref="ArgumentException"></exception>
+			public static string GetCharAndNumber(int Length)
+			{
+				if (Length <= 0) throw new ArgumentException("The Length must be greater than 0");
+				var charList = new char[] { '3', '4', '7', 'A', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'K', 'M', 'N', 'P', 'Q', 'R', 'T', 'U', 'V', 'W', 'X', 'Y', };
+				var result = new char[Length];
+				for (int i = 0; i < Length; i++)
+					result[i] = charList[RandomNumberGenerator.GetInt32(charList.Length)];
+				return new string(result);
+			}
+		}
 		/// <summary>
 		/// 获取MIME类型,可以传入文件名或者文件扩展名
 		/// </summary>

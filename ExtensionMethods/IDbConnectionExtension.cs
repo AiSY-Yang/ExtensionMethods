@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -48,7 +47,7 @@ namespace ExtensionMethods
 		/// <param name="sql">SQL语句</param>
 		/// <param name="paramDict">参数字典</param>
 		/// <returns></returns>
-		public static IDbCommand GenerateCmd(this IDbConnection dbConnection, string sql, Dictionary<string, object> paramDict)
+		public static System.Data.Common.DbCommand GenerateCmd(this IDbConnection dbConnection, string sql, Dictionary<string, object> paramDict)
 		{
 			using var cmd = dbConnection.CreateCommand();
 			cmd.CommandText = sql;
@@ -95,15 +94,17 @@ namespace ExtensionMethods
 					cmd.Parameters.Add(parameter);
 				}
 			}
-			return cmd;
+			return cmd as System.Data.Common.DbCommand;
 		}
 
 		#region 同步调用相关方法
 
+		/// <inheritdoc cref="ExecRowCount(IDbConnection, string, Dictionary{string, object})"/>
 		/// <param name="dbConnection">数据库连接</param>
 		/// <param name="sql">SQL语句</param>
 		public static long ExecRowCount(this IDbConnection dbConnection, string sql) => dbConnection.ExecRowCount(sql, new Dictionary<string, object>());
 
+		/// <inheritdoc cref="ExecRowCount(IDbConnection, string, Dictionary{string, object})"/>
 		/// <param name="dbConnection">数据库连接</param>
 		/// <param name="sql">SQL语句</param>
 		/// <param name="paramName">参数名称</param>
@@ -123,10 +124,12 @@ namespace ExtensionMethods
 			return (long)cmd.ExecuteScalar();
 		}
 
+		/// <inheritdoc cref="ExecSQL(IDbConnection, string, Dictionary{string, object})"/>
 		/// <param name="dbConnection">数据库连接</param>
 		/// <param name="sql">SQL语句</param>
 		public static DataTable ExecSQL(this IDbConnection dbConnection, string sql) => dbConnection.ExecSQL(sql, new Dictionary<string, object>());
 
+		/// <inheritdoc cref="ExecSQL(IDbConnection, string, Dictionary{string, object})"/>
 		/// <param name="dbConnection">数据库连接</param>
 		/// <param name="sql">SQL语句</param>
 		/// <param name="paramName">参数名称</param>
@@ -151,10 +154,12 @@ namespace ExtensionMethods
 			return dataSet.Tables[0];
 		}
 
+		/// <inheritdoc cref="ExecCmd(IDbConnection, string, Dictionary{string, object})"/>
 		/// <param name="dbConnection">数据库连接</param>
 		/// <param name="sql">SQL语句</param>
 		public static int ExecCmd(this IDbConnection dbConnection, string sql) => dbConnection.ExecCmd(sql, new Dictionary<string, object>());
 
+		/// <inheritdoc cref="ExecCmd(IDbConnection, string, Dictionary{string, object})"/>
 		/// <param name="dbConnection">数据库连接</param>
 		/// <param name="sql">SQL语句</param>
 		/// <param name="paramName">参数名称</param>
@@ -176,97 +181,104 @@ namespace ExtensionMethods
 
 		#endregion
 
-		//#region 异步调用相关方法
+		#region 异步调用相关方法
 
+		/// <inheritdoc cref="ExecRowCountAsync(IDbConnection, string, Dictionary{string, object})"/>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		public static async Task<long> ExecRowCountAsync(this IDbConnection dbConnection, string sql) => await dbConnection.ExecRowCountAsync(sql, new Dictionary<string, object>());
 
-		//public static async Task<long> ExecRowCountAsync(this IDbConnection dbConnection, string sql) => await dbConnection.ExecRowCountAsync(sql, new Dictionary<string, object>());
+		/// <inheritdoc cref="ExecRowCountAsync(IDbConnection, string, Dictionary{string, object})"/>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="paramName">参数名称</param>
+		/// <param name="param">参数值</param>
+		public static async Task<long> ExecRowCountAsync(this IDbConnection dbConnection, string sql, IEnumerable<string> paramName, IEnumerable<object> param) => await dbConnection.ExecRowCountAsync(sql, ParamsToDictionary(paramName, param));
 
-		///// <param name="sql">SQL语句</param>
-		///// <param name="paramName">参数名称</param>
-		///// <param name="param">参数值</param>
-		//public static async Task<long> ExecRowCountAsync(this IDbConnection dbConnection, string sql, IEnumerable<string> paramName, IEnumerable<object> param) => await dbConnection.ExecRowCountAsync(sql, ParamsToDictionary(paramName, param));
+		/// <summary>
+		/// 异步查询行数
+		/// </summary>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="paramDict">参数字典</param>
+		/// <returns>行数</returns>
+		public static async Task<long> ExecRowCountAsync(this IDbConnection dbConnection, string sql, Dictionary<string, object> paramDict)
+		{
+			using var cmd = dbConnection.GenerateCmd($@"select count(*) from ({sql}) countTable", paramDict);
+			var result = await cmd.ExecuteScalarAsync();
+			return (long)result;
+		}
 
-		///// <summary>
-		///// 异步查询行数
-		///// </summary>
-		///// <param name="sql">SQL语句</param>
-		///// <param name="paramDict">参数字典</param>
-		///// <returns>行数</returns>
-		//public static async Task<long> ExecRowCountAsync(this IDbConnection dbConnection, string sql, Dictionary<string, object> paramDict)
-		//{
-		//	using IDbCommand cmd = dbConnection.GenerateCmd($@"select count(*) from ({sql}) countTable", paramDict);
-		//	var result = await cmd.().();
-		//	return (long)result;
-		//}
+		/// <inheritdoc cref="ExecSQLAsync(IDbConnection, string, Dictionary{string, object})"/>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		public static async Task<DataTable> ExecSQLAsync(this IDbConnection dbConnection, string sql) => await dbConnection.ExecSQLAsync(sql, new Dictionary<string, object>());
 
-		///// <inheritdoc cref="ExecSQLAsync(string, Dictionary{string, object})"/>
-		//public async Task<DataTable> ExecSQLAsync(string sql) => await ExecSQLAsync(sql, new Dictionary<string, object>());
+		/// <inheritdoc cref="ExecSQLAsync(IDbConnection, string, Dictionary{string, object})"/>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="paramName">参数名称</param>
+		/// <param name="param">参数值</param>
+		public static async Task<DataTable> ExecSQLAsync(this IDbConnection dbConnection, string sql, IEnumerable<string> paramName, IEnumerable<object> param) => await dbConnection.ExecSQLAsync(sql, ParamsToDictionary(paramName, param));
 
-		///// <inheritdoc cref="ExecSQLAsync(string, Dictionary{string, object})"/>
-		///// <param name="sql">SQL语句</param>
-		///// <param name="paramName">参数名称</param>
-		///// <param name="param">参数值</param>
-		//public async Task<DataTable> ExecSQLAsync(string sql, IEnumerable<string> paramName, IEnumerable<object> param) => await ExecSQLAsync(sql, ParamsToDictionary(paramName, param));
+		/// <summary>
+		/// 异步查询数据
+		/// </summary>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="paramDict">参数字典</param>
+		/// <returns>结果表</returns>
+		public static async Task<DataTable> ExecSQLAsync(this IDbConnection dbConnection, string sql, Dictionary<string, object> paramDict)
+		{
+			try
+			{
+				using var cmd = dbConnection.GenerateCmd(sql, paramDict);
+				cmd.CommandTimeout = 60;
+				DataSet dataSet = new DataSet();
+				dataSet.EnforceConstraints = false;
+				dataSet.Tables.Add(new DataTable());
+				dataSet.Tables[0].Load(await cmd.ExecuteReaderAsync());
+				return dataSet.Tables[0];
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("SQL错误" + sql + e.Message);
+				throw;
+			}
+		}
 
-		///// <summary>
-		///// 异步查询数据
-		///// </summary>
-		///// <param name="sql">SQL语句</param>
-		///// <param name="paramDict">参数字典</param>
-		///// <returns>结果表</returns>
-		//public async Task<DataTable> ExecSQLAsync(string sql, Dictionary<string, object> paramDict)
-		//{
-		//	try
-		//	{
-		//		using MySqlCommand cmd = GenerateCmd(sql, paramDict);
-		//		cmd.CommandTimeout = 60;
-		//		DataSet dataSet = new DataSet();
-		//		dataSet.EnforceConstraints = false;
-		//		dataSet.Tables.Add(new DataTable());
-		//		dataSet.Tables[0].Load(await cmd.ExecuteReaderAsync());
-		//		return dataSet.Tables[0];
-		//	}
-		//	catch (Exception e)
-		//	{
-		//		Console.WriteLine("SQL错误" + sql + e.Message);
-		//		throw;
-		//	}
-		//}
+		/// <inheritdoc cref="ExecCmdAsync(IDbConnection, string, Dictionary{string, object})"/>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		public static async Task<int> ExecCmdAsync(this IDbConnection dbConnection, string sql) => await dbConnection.ExecCmdAsync(sql, new Dictionary<string, object>());
 
-		///// <inheritdoc cref="ExecCmdAsync(string, Dictionary{string, object})"/>
-		//public async Task<int> ExecCmdAsync(string sql) => await ExecCmdAsync(sql, new Dictionary<string, object>());
+		/// <inheritdoc cref="ExecCmdAsync(IDbConnection, string, Dictionary{string, object})"/>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="paramName">参数名称</param>
+		/// <param name="param">参数值</param>
+		public static async Task<int> ExecCmdAsync(this IDbConnection dbConnection, string sql, IEnumerable<string> paramName, IEnumerable<object> param) => await dbConnection.ExecCmdAsync(sql, ParamsToDictionary(paramName, param));
 
-		///// <inheritdoc cref="ExecCmdAsync(string, Dictionary{string, object})"/>
-		///// <param name="sql">SQL语句</param>
-		///// <param name="paramName">参数名称</param>
-		///// <param name="param">参数值</param>
-		//public async Task<int> ExecCmdAsync(string sql, IEnumerable<string> paramName, IEnumerable<object> param) => await ExecCmdAsync(sql, ParamsToDictionary(paramName, param));
-
-		///// <summary>
-		///// 异步执行命令
-		///// </summary>
-		///// <param name="sql">SQL语句</param>
-		///// <param name="paramDict">参数字典</param>
-		///// <returns>修改行数</returns>
-		//public async Task<int> ExecCmdAsync(string sql, Dictionary<string, object> paramDict)
-		//{
-		//	try
-		//	{
-		//		using MySqlCommand cmd = GenerateCmd(sql, paramDict);
-		//		return await cmd.ExecuteNonQueryAsync();
-		//	}
-		//	catch (Exception e)
-		//	{
-		//		Console.WriteLine("SQL错误" + sql + e.Message);
-		//		throw;
-		//	}
-		//}
-
-		///// <summary>
-		///// 异步释放对象
-		///// </summary>
-		///// <returns></returns>
-		//public ValueTask DisposeAsync() => Connection.DisposeAsync();
-		//#endregion
+		/// <summary>
+		/// 异步执行命令
+		/// </summary>
+		/// <param name="dbConnection">连接</param>
+		/// <param name="sql">SQL语句</param>
+		/// <param name="paramDict">参数字典</param>
+		/// <returns>修改行数</returns>
+		public static async Task<int> ExecCmdAsync(this IDbConnection dbConnection, string sql, Dictionary<string, object> paramDict)
+		{
+			try
+			{
+				using var cmd = dbConnection.GenerateCmd(sql, paramDict);
+				return await cmd.ExecuteNonQueryAsync();
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine("SQL错误" + sql + e.Message);
+				throw;
+			}
+		}
+		#endregion
 	}
 }
