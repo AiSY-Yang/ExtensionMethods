@@ -33,7 +33,7 @@ namespace ExtensionMethods
 		/// </summary>
 		/// <param name="_byte"></param>
 		/// <returns></returns>
-		public static string ToHexString(this byte[] _byte) => _byte.Select(x => x.ToString("x2")).Aggregate((x, y) => x + y);
+		public static string ToHexString(this byte[] _byte) => string.Concat(_byte.Select(x => x.ToString("x2")).ToArray());
 		/// <summary>
 		/// 转换为字符串,默认使用UTF-8 转换失败后使用此编码
 		/// <list type="table">
@@ -111,7 +111,7 @@ namespace ExtensionMethods
 					}
 					return string.Format("{0:X}", crc).PadLeft(4, '0');
 				default:
-					throw new System.ComponentModel.InvalidEnumArgumentException("枚举值不存在");
+					throw new System.ComponentModel.InvalidEnumArgumentException(nameof(CrcOption), (int)crcOption, typeof(CrcOption));
 			}
 		}
 
@@ -154,7 +154,7 @@ namespace ExtensionMethods
 					NullCheck();
 					return new System.Security.Cryptography.HMACSHA512(secret).ComputeHash(byteArray);
 				default:
-					throw new System.ComponentModel.InvalidEnumArgumentException("枚举值不存在");
+					throw new System.ComponentModel.InvalidEnumArgumentException(nameof(HashOption), (int)hashOption, typeof(HashOption));
 			}
 			void NullCheck()
 			{
@@ -205,24 +205,24 @@ namespace ExtensionMethods
 		/// </summary>
 		SHA512,
 		/// <summary>
-		/// HmacMD5的16进制表现形式
+		/// HmacMD5
 		/// </summary>
 		HmacMD5,
 		/// <summary>
-		/// HmacSHA1的16进制表现形式
+		/// HmacSHA1
 		/// </summary>
 		/// 	
 		HmacSHA1,
 		/// <summary>
-		/// HmacSHA256的16进制表现形式
+		/// HmacSHA256
 		/// </summary>
 		HmacSHA256,
 		/// <summary>
-		/// HmacSHA384的16进制表现形式
+		/// HmacSHA384
 		/// </summary>
 		HmacSHA384,
 		/// <summary>
-		/// HmacSHA512的16进制表现形式
+		/// HmacSHA512
 		/// </summary>
 		HmacSHA512,
 	}

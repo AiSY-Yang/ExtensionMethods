@@ -50,7 +50,7 @@ namespace ExtensionMethods
 		/// <param name="url"></param>
 		/// <param name="cover">当文件已经存在时覆盖</param>
 		/// <returns></returns>
-		public static async System.Threading.Tasks.Task<bool> Download(this FileInfo f, string url, bool cover = true)
+		public static async System.Threading.Tasks.Task<bool> DownloadAsync(this FileInfo f, string url, bool cover = true)
 		{
 			string localfileReal = f.FullName;
 			string localfileWithSuffix = localfileReal + Suffix;
@@ -85,7 +85,7 @@ namespace ExtensionMethods
 					{
 						writeStream.Close();
 						File.Delete(localfileWithSuffix);
-						writeStream = new FileStream(localfileWithSuffix,  FileMode.Create);
+						writeStream = new FileStream(localfileWithSuffix, FileMode.Create);
 					}
 					else if (startPosition == remoteFileLength)
 					{
@@ -99,16 +99,13 @@ namespace ExtensionMethods
 				else
 					writeStream = new FileStream(localfileWithSuffix, FileMode.Create);
 
-				HttpWebRequest req = null;
-				HttpWebResponse rsp = null;
 				try
 				{
-					req = (HttpWebRequest)HttpWebRequest.Create(url);
 					if (startPosition > 0)
-						req.AddRange((int)startPosition);
+						client.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(startPosition, null);
+					res = await client.GetAsync(url);
 
-					rsp = (HttpWebResponse)req.GetResponse();
-					using (Stream readStream = rsp.GetResponseStream())
+					using (Stream readStream = await res.Content.ReadAsStreamAsync())
 					{
 						byte[] btArray = new byte[ByteSize];
 						long currPostion = startPosition;
@@ -131,10 +128,6 @@ namespace ExtensionMethods
 				{
 					if (writeStream != null)
 						writeStream.Close();
-					if (rsp != null)
-						rsp.Close();
-					if (req != null)
-						req.Abort();
 					DownloadFileOk(localfileReal, localfileWithSuffix);
 				}
 			}
@@ -142,7 +135,10 @@ namespace ExtensionMethods
 			{
 				throw;
 			}
+			finally
+			{
+
+			}
 		}
 	}
-
 }

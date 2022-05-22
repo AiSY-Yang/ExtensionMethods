@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -42,17 +40,8 @@ namespace ExtensionMethods
 		/// <param name="str"></param>
 		/// <param name="shortStringArray">字符串数组</param>
 		/// <returns></returns>
-		public static bool Contains(this string str, IEnumerable<string> shortStringArray)
-		{
-			foreach (var item in shortStringArray)
-			{
-				if (str.Contains(item))
-				{
-					return true;
-				}
-			}
-			return false;
-		}
+		public static bool Contains(this string str, IEnumerable<string> shortStringArray) => shortStringArray.Any(item => str.Contains(item));
+
 		/// <summary>
 		/// 删除字符串中的中文
 		/// </summary>
@@ -64,9 +53,7 @@ namespace ExtensionMethods
 				foreach (var item in str)
 				{
 					if (item >= 0x4e00 && item <= 0x9fa5)
-					{
 						continue;
-					}
 					else
 					{
 						stringBuilder.Append(item);
@@ -80,18 +67,10 @@ namespace ExtensionMethods
 			}
 		}
 
-		/// <summary>
-		/// 判断空
-		/// </summary>
-		/// <param name="inputStr"></param>
-		/// <returns></returns>
+		///<inheritdoc cref="string.IsNullOrEmpty(string)"/>
 		public static bool IsNullOrEmpty(this string inputStr) => string.IsNullOrEmpty(inputStr);
 
-		/// <summary>
-		/// 判断空
-		/// </summary>
-		/// <param name="inputStr"></param>
-		/// <returns></returns>
+		///<inheritdoc cref="string.IsNullOrWhiteSpace(string)"/>
 		public static bool IsNullOrWhiteSpace(this string inputStr) => string.IsNullOrWhiteSpace(inputStr);
 
 		///<inheritdoc cref="ByteExtension.CRC(byte[], CrcOption)"/>
@@ -107,14 +86,12 @@ namespace ExtensionMethods
 		/// <param name="encryptOption"></param>
 		/// <param name="secret">秘钥</param>
 		/// <param name="iv">DES加密向量</param>
-		/// <returns></returns>
+		/// <returns>base64编码的结果</returns>
 		/// <exception cref="ArgumentException">Thrown when string is null or empty.</exception>
 		public static string Encrypt(this string _string, EncryptOption encryptOption, string secret = null, string iv = null)
 		{
 			if (string.IsNullOrEmpty(_string))
-			{
 				throw new ArgumentException("String is null or empty");
-			}
 			using var des = System.Security.Cryptography.DES.Create();
 			switch (encryptOption)
 			{
@@ -135,16 +112,12 @@ namespace ExtensionMethods
 					des.Padding = System.Security.Cryptography.PaddingMode.ANSIX923;
 					break;
 				default:
-					throw new InvalidEnumArgumentException("枚举值不存在");
+					throw new System.ComponentModel.InvalidEnumArgumentException(nameof(EncryptOption), (int)encryptOption, typeof(EncryptOption));
 			}
 			if (!string.IsNullOrEmpty(secret))
-			{
 				des.Key = Encoding.UTF8.GetBytes(secret);
-			}
 			if (!string.IsNullOrEmpty(iv))
-			{
 				des.IV = Encoding.UTF8.GetBytes(iv);
-			}
 			using System.Security.Cryptography.ICryptoTransform ct = des.CreateEncryptor();
 			byte[] by = Encoding.UTF8.GetBytes(_string);
 			using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
@@ -165,9 +138,7 @@ namespace ExtensionMethods
 		public static string Decrypt(this string _string, EncryptOption decryptOption, string secret = null, string iv = null)
 		{
 			if (string.IsNullOrEmpty(_string))
-			{
-				throw new ArgumentException("String is null or empty");
-			}
+				throw new ArgumentNullException("String is null or empty");
 			using var des = System.Security.Cryptography.DES.Create();
 			switch (decryptOption)
 			{
@@ -188,16 +159,12 @@ namespace ExtensionMethods
 					des.Padding = System.Security.Cryptography.PaddingMode.ANSIX923;
 					break;
 				default:
-					throw new InvalidEnumArgumentException("枚举值不存在");
+					throw new System.ComponentModel.InvalidEnumArgumentException(nameof(EncryptOption), (int)decryptOption, typeof(EncryptOption));
 			}
 			if (!string.IsNullOrEmpty(secret))
-			{
 				des.Key = Encoding.UTF8.GetBytes(secret);
-			}
 			if (!string.IsNullOrEmpty(iv))
-			{
 				des.IV = Encoding.UTF8.GetBytes(iv);
-			}
 			using System.Security.Cryptography.ICryptoTransform ct = des.CreateDecryptor();
 			byte[] by = System.Convert.FromBase64String(_string);
 			using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
@@ -226,7 +193,6 @@ namespace ExtensionMethods
 				}
 				catch (FormatException)
 				{
-
 					return (int)double.Parse(str);
 				}
 			}
@@ -259,17 +225,10 @@ namespace ExtensionMethods
 		{
 			checked
 			{
-				try
-				{
-					var x = double.Parse(str);
-					if (double.IsInfinity(x))
-						throw new OverflowException($"result overflow");
-					else return x;
-				}
-				catch (FormatException ex)
-				{
-					throw new FormatException($"{str} is not a number", ex);
-				}
+				var x = double.Parse(str);
+				if (double.IsInfinity(x))
+					throw new OverflowException($"result overflow");
+				else return x;
 			}
 		}
 		/// <summary>
@@ -294,12 +253,13 @@ namespace ExtensionMethods
 		/// <code>"yyyy-MM-dd HH:mm:ss"</code>
 		/// <code>"yyyy-MM-dd HH:mm"</code>
 		/// <code>"yyyy-MM-dd HH"</code>
+		/// <code>"yyyy-MM-dd"</code>
+		/// <code>"yyyy-MM"</code>
 		/// <code>"yyyyMMddHHmmss"</code>
 		/// <code>"yyyyMMddHHmm"</code>
 		/// <code>"yyyyMMddHH"</code>
 		/// <code>"yyyyMMdd"</code>
 		/// <code>"yyyyMM"</code>
-		/// <code>"yyyy"</code>
 		/// </summary>
 		/// <param name="str"></param>
 		/// <exception cref="FormatException">不是有效的时间格式</exception>
@@ -308,20 +268,17 @@ namespace ExtensionMethods
 		public static DateTime ToDateTime(this string str)
 		{
 			//加快速度 先按照最常用方法解析
-			try
+			if (DateTime.TryParse(str, out DateTime result))
+				return result;
+			else
 			{
-				return DateTime.Parse(str);
-			}
-			catch (Exception)
-			{
-				if (RegexCache.yyyyMMddHHWithSplit.IsMatch(str)) return DateTime.Parse(str + ":00");
-				if (RegexCache.yyyyMMddHHmmss.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:{str[12..14]}");
-				if (RegexCache.yyyyMMddHHmm.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:{str[10..12]}:00");
-				if (RegexCache.yyyyMMddHH.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} {str[8..10]}:00:00");
-				if (RegexCache.yyyyMMdd.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-{str[6..8]} 00:00:00");
-				if (RegexCache.yyyyMM.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-{str[4..6]}-01 00:00:00");
-				if (RegexCache.yyyy.IsMatch(str)) return DateTime.Parse($"{str[0..4]}-01-01 00:00:00");
-				throw;
+				if (DateTime.TryParseExact(str, "yyyy-MM-dd HH", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHHWithSplit)) return yyyyMMddHHWithSplit;
+				if (DateTime.TryParseExact(str, "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHHmmss)) return yyyyMMddHHmmss;
+				if (DateTime.TryParseExact(str, "yyyyMMddHHmm", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHHmm)) return yyyyMMddHHmm;
+				if (DateTime.TryParseExact(str, "yyyyMMddHH", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHH)) return yyyyMMddHH;
+				if (DateTime.TryParseExact(str, "yyyyMMdd", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMdd)) return yyyyMMdd;
+				if (DateTime.TryParseExact(str, "yyyyMM", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMM)) return yyyyMM;
+				throw new FormatException($"{str} cannot be converted to a date");
 			}
 		}
 		/// <summary>
@@ -514,9 +471,7 @@ namespace ExtensionMethods
 						break;
 					case System.Text.Json.JsonValueKind.String:
 						if (DateTime.TryParse(property.Value.GetString(), out DateTime _))
-						{
 							ls.Add($"{new string('\t', level)}public DateTime {property.Name} {{get;set;}}\r\n");
-						}
 						else
 						{
 							ls.Add($"{new string('\t', level)}public string {property.Name} {{get;set;}}\r\n");
@@ -539,7 +494,7 @@ namespace ExtensionMethods
 						break;
 				}
 			};
-			return string.Join("", ls);
+			return string.Concat(ls);
 		}
 		#endregion
 	}
@@ -564,48 +519,5 @@ namespace ExtensionMethods
 		/// DES加密 采用CBC方式 ANSIX923填充
 		/// </summary>
 		DES_CBC_ANSIX923,
-	}
-	/// <summary>
-	/// 缓存所用到的正则表达式
-	/// </summary>
-	static class RegexCache
-	{
-
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>yyyy-M-d H:m</code>
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHHWithSplit = new System.Text.RegularExpressions.Regex(@"^\d{4}-\d{1,2}-\d{1,2} \d{1,2}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>yyyyMMddHHmmss</code>
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHHmmss = new System.Text.RegularExpressions.Regex(@"^\d{14}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>yyyyMMddHHmm</code>
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHHmm = new System.Text.RegularExpressions.Regex(@"^\d{12}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>yyyyMMddHH</code>
-		/// 与秒级时间戳timestampSecond形式相同
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex yyyyMMddHH = new System.Text.RegularExpressions.Regex(@"^\d{10}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>yyyyMMdd</code>
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex yyyyMMdd = new System.Text.RegularExpressions.Regex(@"^\d{8}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>yyyyMM</code>
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex yyyyMM = new System.Text.RegularExpressions.Regex(@"^\d{6}$");
-		/// <summary>
-		/// 转换日期时间所用到的正则表达式
-		/// <code>yyyy</code>
-		/// </summary>
-		internal static readonly System.Text.RegularExpressions.Regex yyyy = new System.Text.RegularExpressions.Regex(@"^\d{4}$");
 	}
 }

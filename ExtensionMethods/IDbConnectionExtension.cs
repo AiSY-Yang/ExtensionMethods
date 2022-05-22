@@ -234,8 +234,10 @@ namespace ExtensionMethods
 			{
 				using var cmd = dbConnection.GenerateCmd(sql, paramDict);
 				cmd.CommandTimeout = 60;
-				DataSet dataSet = new DataSet();
-				dataSet.EnforceConstraints = false;
+				DataSet dataSet = new DataSet
+				{
+					EnforceConstraints = false
+				};
 				dataSet.Tables.Add(new DataTable());
 				dataSet.Tables[0].Load(await cmd.ExecuteReaderAsync());
 				return dataSet.Tables[0];

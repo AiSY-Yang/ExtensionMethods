@@ -61,7 +61,7 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static string ToInsertSQL(this DataTable dataTable, bool Replace, bool IncludeColumnName = false)
 		{
-			if (string.IsNullOrWhiteSpace( dataTable.TableName))
+			if (string.IsNullOrWhiteSpace(dataTable.TableName))
 			{
 				throw new ArgumentException("表名为空");
 			}
@@ -94,12 +94,12 @@ namespace ExtensionMethods
 					cols.Add(item.ColumnName);
 				}
 				return $@"{(Replace ? "replace" : "insert ignore")} into {dataTable.TableName} ({string.Join(",", cols)}) values
-" + string.Join(",\r\n", rows);
+{string.Join(",\r\n", rows)}";
 			}
 			else
 			{
 				return $@"{(Replace ? "replace" : "insert ignore")} into {dataTable.TableName} value
-" + string.Join(",\r\n", rows);
+{string.Join(",\r\n", rows)}";
 			}
 		}
 	}
