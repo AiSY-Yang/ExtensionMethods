@@ -1,7 +1,10 @@
 ﻿
+using System;
 using System.Text;
 
 using ExtensionMethods;
+
+using OfficeOpenXml.ConditionalFormatting;
 
 using Xunit;
 
@@ -47,6 +50,35 @@ namespace ExtensionMethodsTests
 			Assert.Equal("你好", helloUtf8NoBom.ToString(Encoding.GetEncoding("gb2312")));
 			Assert.Equal("你好", helloUtf8WithBom.ToString(Encoding.GetEncoding("gb2312")));
 			Assert.Equal("你好", helloGb2312.ToString(Encoding.GetEncoding("gb2312")));
+		}
+
+		byte[] key = "12345678".ToByteArray();
+		byte[] iv = "87654321".ToByteArray();
+		[Fact]
+		public void DESEncrypt()
+		{
+			Assert.Equal(Array.Empty<byte>(), Array.Empty<byte>().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.None));
+			Assert.Equal(Convert.FromBase64String("VrHKOUNsGcA="), "abcdefgh".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.None));
+			Assert.Equal(Convert.FromBase64String("UFAZxUlQ7Pc="), "你好nh".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.None));
+			Assert.Equal(Convert.FromBase64String("BUhZfGyF0Mw="), "a".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.PKCS7));
+			Assert.Equal(Convert.FromBase64String("5GgZng1JeGk="), "你好".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.PKCS7));
+			Assert.Equal(Convert.FromBase64String("8KM3WaJc8iw="), "a".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.Zeros));
+			Assert.Equal(Convert.FromBase64String("251F1V4AXBk="), "你好".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.Zeros));
+			Assert.Equal(Convert.FromBase64String("euXBnQ9xZT8="), "a".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.ANSIX923));
+			Assert.Equal(Convert.FromBase64String("c2Z+3TwvMYQ="), "你好".ToByteArray().DESEncrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.ANSIX923));
+		}
+		[Fact]
+		public void DESDecrypt()
+		{
+			Assert.Equal(Array.Empty<byte>(), (Array.Empty<byte>()).DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.None));
+			Assert.Equal("abcdefgh".ToByteArray(), Convert.FromBase64String("VrHKOUNsGcA=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.None));
+			Assert.Equal("你好nh".ToByteArray(), Convert.FromBase64String("UFAZxUlQ7Pc=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.None));
+			Assert.Equal("a".ToByteArray(), Convert.FromBase64String("BUhZfGyF0Mw=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.PKCS7));
+			Assert.Equal("你好".ToByteArray(), Convert.FromBase64String("5GgZng1JeGk=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.PKCS7));
+			Assert.Equal("a\0\0\0\0\0\0\0".ToByteArray(), Convert.FromBase64String("8KM3WaJc8iw=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.Zeros));
+			Assert.Equal("你好\0\0".ToByteArray(), Convert.FromBase64String("251F1V4AXBk=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.Zeros));
+			Assert.Equal("a".ToByteArray(), Convert.FromBase64String("euXBnQ9xZT8=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.ANSIX923));
+			Assert.Equal("你好".ToByteArray(), Convert.FromBase64String("c2Z+3TwvMYQ=").DESDecrypt(key, iv, System.Security.Cryptography.CipherMode.CBC, System.Security.Cryptography.PaddingMode.ANSIX923));
 		}
 	}
 }

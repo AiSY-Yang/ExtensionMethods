@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 
@@ -88,6 +89,7 @@ namespace ExtensionMethods
 		/// <param name="iv">DES加密向量</param>
 		/// <returns>base64编码的结果</returns>
 		/// <exception cref="ArgumentException">Thrown when string is null or empty.</exception>
+		[Obsolete("更改为独立的方法 DESEncrypt")]
 		public static string Encrypt(this string _string, EncryptOption encryptOption, string secret = null, string iv = null)
 		{
 			if (string.IsNullOrEmpty(_string))
@@ -135,10 +137,11 @@ namespace ExtensionMethods
 		/// <param name="secret">密钥</param>
 		/// <param name="iv">偏移量</param>
 		/// <returns></returns>
+		[Obsolete("更改为独立的方法 DESEncrypt")]
 		public static string Decrypt(this string _string, EncryptOption decryptOption, string secret = null, string iv = null)
 		{
 			if (string.IsNullOrEmpty(_string))
-				throw new ArgumentNullException("String is null or empty");
+				throw new ArgumentNullException(nameof(_string));
 			using var des = System.Security.Cryptography.DES.Create();
 			switch (decryptOption)
 			{
@@ -175,6 +178,32 @@ namespace ExtensionMethods
 			}
 			return Encoding.UTF8.GetString(outStream.ToArray());
 		}
+		/// <summary>
+		/// DES加密
+		/// </summary>
+		/// <param name="data">待加密数据</param>
+		/// <param name="secret">密钥</param>
+		/// <param name="iv">偏移量</param>
+		/// <param name="cipherMode">加密方式</param>
+		/// <param name="paddingMode">填充模式</param>
+		/// <returns>base64的加密结果</returns>
+		public static string DESEncrypt(this string data, string secret, string iv, System.Security.Cryptography.CipherMode cipherMode, System.Security.Cryptography.PaddingMode paddingMode)
+		{
+			return System.Convert.ToBase64String(data.ToByteArray().DESEncrypt(secret.ToByteArray(), iv.ToByteArray(), cipherMode, paddingMode));
+		}
+		/// <summary>
+		/// 将字符串当作base64编码进行DES解密
+		/// </summary>
+		/// <param name="data">待解密数据</param>
+		/// <param name="secret">密钥</param>
+		/// <param name="iv">偏移量</param>
+		/// <param name="cipherMode">解密方式</param>
+		/// <param name="paddingMode">填充模式</param>
+		/// <returns>UTF8编码的字符串</returns>
+		public static string DESDecrypt(this string data, string secret, string iv, System.Security.Cryptography.CipherMode cipherMode, System.Security.Cryptography.PaddingMode paddingMode)
+		{
+			return Encoding.UTF8.GetString(System.Convert.FromBase64String(data).DESEncrypt(secret.ToByteArray(), iv.ToByteArray(), cipherMode, paddingMode));
+		}
 		#region Convert
 		/// <summary>
 		/// 转换为整型,如果为小数则截断小数部分
@@ -185,13 +214,13 @@ namespace ExtensionMethods
 		/// <exception cref="OverflowException"></exception>
 		public static int ToInt(this string str)
 		{
-			checked
+			try
 			{
-				try
-				{
-					return int.Parse(str);
-				}
-				catch (FormatException)
+				return int.Parse(str);
+			}
+			catch (FormatException)
+			{
+				checked
 				{
 					return (int)double.Parse(str);
 				}
@@ -249,7 +278,7 @@ namespace ExtensionMethods
 			}
 		}
 		/// <summary>
-		/// 转换到日期时间类型,转换失败时抛出异常
+		/// 转换到日期时间类型,转换失败时抛出异常 默认时区为当前时区,支持以下格式
 		/// <code>"yyyy-MM-dd HH:mm:ss"</code>
 		/// <code>"yyyy-MM-dd HH:mm"</code>
 		/// <code>"yyyy-MM-dd HH"</code>
@@ -263,7 +292,6 @@ namespace ExtensionMethods
 		/// </summary>
 		/// <param name="str"></param>
 		/// <exception cref="FormatException">不是有效的时间格式</exception>
-		/// <exception cref="ArgumentNullException">字符串为空</exception>
 		/// <returns></returns>
 		public static DateTime ToDateTime(this string str)
 		{
@@ -272,13 +300,14 @@ namespace ExtensionMethods
 				return result;
 			else
 			{
+				if (DateTime.TryParseExact(str, "yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime JsonFormat)) return JsonFormat;
 				if (DateTime.TryParseExact(str, "yyyy-MM-dd HH", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHHWithSplit)) return yyyyMMddHHWithSplit;
 				if (DateTime.TryParseExact(str, "yyyyMMddHHmmss", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHHmmss)) return yyyyMMddHHmmss;
 				if (DateTime.TryParseExact(str, "yyyyMMddHHmm", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHHmm)) return yyyyMMddHHmm;
 				if (DateTime.TryParseExact(str, "yyyyMMddHH", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMddHH)) return yyyyMMddHH;
 				if (DateTime.TryParseExact(str, "yyyyMMdd", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMMdd)) return yyyyMMdd;
 				if (DateTime.TryParseExact(str, "yyyyMM", System.Globalization.CultureInfo.CurrentCulture, System.Globalization.DateTimeStyles.None, out DateTime yyyyMM)) return yyyyMM;
-				throw new FormatException($"{str} cannot be converted to a date");
+				throw new FormatException($"string \"{str}\" cannot be converted to a date");
 			}
 		}
 		/// <summary>
@@ -305,6 +334,40 @@ namespace ExtensionMethods
 			catch (Exception)
 			{
 				return defaultDateTime;
+			}
+		}
+		/// <summary>
+		/// 转换到时间类型,转换失败时抛出异常,默认时区为当前时区,支持以下格式
+		/// <code>"yyyy-MM-dd HH:mm:ss.ffffff+00:00"</code>
+		/// </summary>
+		/// <param name="str"></param>
+		/// <exception cref="FormatException">不是有效的时间格式</exception>
+		/// <returns></returns>
+		public static DateTimeOffset ToDateTimeOffset(this string str)
+		{
+			//加快速度 先按照最常用方法解析
+			if (DateTimeOffset.TryParse(str, out DateTimeOffset result))
+				return result;
+			else
+			{
+				throw new FormatException($"string \"{str}\" cannot be converted to a date");
+			}
+		}
+		/// <summary>
+		/// 转换到时间类型,转换失败时返回defaultDateTime
+		/// </summary>
+		/// <param name="str"></param>
+		/// <param name="defaultDateTimeOffset">转换失败的时候返回的时间</param>
+		/// <returns></returns>
+		public static DateTimeOffset ToDateTimeOffset(this string str, DateTimeOffset defaultDateTimeOffset)
+		{
+			try
+			{
+				return str.ToDateTime();
+			}
+			catch (Exception)
+			{
+				return defaultDateTimeOffset;
 			}
 		}
 		/// <summary>
@@ -341,7 +404,7 @@ namespace ExtensionMethods
 			}
 		}
 		/// <summary>
-		/// 从UTF8转换为Base64字符串
+		/// 使用UTF8编码转换为Base64字符串
 		/// </summary>
 		/// <param name="_string"></param>
 		/// <returns></returns>
@@ -357,6 +420,64 @@ namespace ExtensionMethods
 			System.IO.MemoryStream ms = new System.IO.MemoryStream();
 			ms.Write(bytes, 0, bytes.Length);
 			return ms;
+		}
+		/// <summary>
+		/// 转换到指定的命名方式
+		/// </summary>
+		/// <param name="identifier"></param>
+		/// <param name="namingConvention"></param>
+		/// <returns></returns>
+		/// <exception cref="InvalidEnumArgumentException"></exception>
+		public static string ToNamingConvention(this string identifier, NamingConvention namingConvention)
+		{
+			int wordCount = 0;
+			return namingConvention switch
+			{
+				NamingConvention.flatcase => identifier.Replace("-", "").Replace("_", "").ToLower(),
+				NamingConvention.UPPERCASE => identifier.Replace("-", "").Replace("_", "").ToUpper(),
+				NamingConvention.camelCase => string.Concat(SplitWord(identifier).Select(x => { return wordCount++ == 0 ? x.ToLower() : string.Concat(char.ToUpper(x[0]), x[1..].ToLower()); })),
+				NamingConvention.PascalCase => string.Concat(SplitWord(identifier).Select(x => string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
+				NamingConvention.snake_case => string.Join('_', SplitWord(identifier).Select(x => x.ToLower())),
+				NamingConvention.camel_Snake_Case => string.Join('_', SplitWord(identifier).Select(x => { return wordCount++ == 0 ? x.ToLower() : string.Concat(char.ToUpper(x[0]), x[1..].ToLower()); })),
+				NamingConvention.MACRO_CASE => string.Join('_', SplitWord(identifier).Select(x => x.ToUpper())),
+				NamingConvention.Pascal_Snake_Case => string.Join('_', SplitWord(identifier).Select(x => string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
+				NamingConvention.kebab一case => string.Join('-', SplitWord(identifier).Select(x => x.ToLower())),
+				NamingConvention.TRAIN一CASE => string.Join('-', SplitWord(identifier).Select(x => x.ToUpper())),
+				NamingConvention.Train一Case => string.Join('-', SplitWord(identifier).Select(x => string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
+				_ => throw new InvalidEnumArgumentException(nameof(NamingConvention)),
+			};
+			//分割标识符单词
+			List<string> SplitWord(string identifier)
+			{
+				bool lastIsUpper = false;
+				var charList = new char[identifier.Length * 2];
+				for (int i = 0, j = 0; i < identifier.Length; i++, j++)
+				{
+					if (char.IsUpper(identifier[i]))
+					{
+						if (!lastIsUpper)
+						{
+							charList[j] = '-';
+							j++;
+							lastIsUpper = true;
+						}
+					}
+					else
+					{
+						lastIsUpper = false;
+					}
+
+					charList[j] = identifier[i];
+				}
+				var wordList = new List<string>();
+				var l = string.Concat(charList).TrimEnd('\0')
+					.Split(new char[] { '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
+				for (int i = 0; i < l.Length; i++)
+				{
+					wordList.Add(l[i]);
+				}
+				return wordList;
+			}
 		}
 		#endregion
 
@@ -404,12 +525,13 @@ namespace ExtensionMethods
 			ls.Add("public class ROOT {\r\n");
 			RecursionJsonElement(element);
 			ls.Add("}");
+
 			void RecursionJsonElement(System.Text.Json.JsonElement element, int level = 0)
 			{
 				switch (element.ValueKind)
 				{
 					case System.Text.Json.JsonValueKind.Undefined:
-						throw new ArgumentException("Impossible");
+						throw new NotSupportedException(element.GetRawText());
 					case System.Text.Json.JsonValueKind.Object:
 						foreach (var item in element.EnumerateObject())
 							RecursionJsonProperty(item, level + 1);
@@ -441,11 +563,12 @@ namespace ExtensionMethods
 						ls.Add("^1");
 						break;
 					case System.Text.Json.JsonValueKind.Null:
-						throw new ArgumentException("Impossible");
+						throw new NotSupportedException(element.GetRawText());
 					default:
-						throw new ArgumentException("Impossible");
+						throw new NotSupportedException(element.GetRawText());
 				}
 			}
+
 			void RecursionJsonProperty(System.Text.Json.JsonProperty property, int level)
 			{
 				switch (property.Value.ValueKind)
@@ -519,5 +642,104 @@ namespace ExtensionMethods
 		/// DES加密 采用CBC方式 ANSIX923填充
 		/// </summary>
 		DES_CBC_ANSIX923,
+	}
+	/// <summary>
+	/// 标识符命名约定
+	/// <a href="https://en.wikipedia.org/wiki/Naming_convention_(programming)#Multiple-word_identifiers"></a>
+	/// </summary>
+	public enum NamingConvention
+	{
+		/// <summary>
+		/// 小写
+		/// </summary>
+		flatcase = 1,
+		/// <summary>
+		/// 大写
+		/// </summary>
+		UPPERCASE,
+		/// <summary>
+		/// 小驼峰
+		/// </summary>
+		camelCase,
+		/// <summary>
+		/// 
+		/// </summary>
+		dromedaryCase = camelCase,
+		/// <summary>
+		/// 帕斯卡
+		/// </summary>
+		PascalCase,
+		/// <summary>
+		/// 大驼峰
+		/// </summary>
+		UpperCamelCase = PascalCase,
+		/// <summary>
+		/// 
+		/// </summary>
+		StudlyCase = PascalCase,
+		/// <summary>
+		/// 蛇形命名
+		/// </summary>
+		snake_case,
+		/// <summary>
+		/// 
+		/// </summary>
+		pothole_case = snake_case,
+		/// <summary>
+		/// 
+		/// </summary>
+		SCREAMING_SNAKE_CASE,
+		/// <summary>
+		/// 宏命名
+		/// </summary>
+		MACRO_CASE = SCREAMING_SNAKE_CASE,
+		/// <summary>
+		/// 
+		/// </summary>
+		CONSTANT_CASE = SCREAMING_SNAKE_CASE,
+		/// <summary>
+		/// 
+		/// </summary>
+		camel_Snake_Case,
+		/// <summary>
+		/// 
+		/// </summary>
+		Pascal_Snake_Case,
+		/// <summary>
+		/// 
+		/// </summary>
+		kebab一case,
+		/// <summary>
+		/// 
+		/// </summary>
+		dash一case = kebab一case,
+		/// <summary>
+		/// 
+		/// </summary>
+		lisp一case = kebab一case,
+		/// <summary>
+		/// 
+		/// </summary>
+		spinal一case = kebab一case,
+		/// <summary>
+		/// 
+		/// </summary>
+		TRAIN一CASE,
+		/// <summary>
+		/// 
+		/// </summary>
+		COBOL一CASE = TRAIN一CASE,
+		/// <summary>
+		/// 
+		/// </summary>
+		SCREAMING一KEBAB一CASE = TRAIN一CASE,
+		/// <summary>
+		/// 
+		/// </summary>
+		Train一Case,
+		/// <summary>
+		/// Http Heade形式
+		/// </summary>
+		HTTP一Header一Case = Train一Case,
 	}
 }

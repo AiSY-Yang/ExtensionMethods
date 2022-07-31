@@ -118,7 +118,7 @@ namespace ExtensionMethods
 		/// <param name="page">The page of return, return first page when page less 1</param>
 		/// <param name="pageSize">pageSize</param>
 		/// <returns></returns>
-		public static IQueryable<TSource> Pageing<TSource>(this IQueryable<TSource> source, int page, int pageSize) => pageSize < 1 ? source : source.Skip(pageSize * (page < 0 ? 0 : page - 1)).Take(pageSize);
+		public static IQueryable<TSource> Pageing<TSource>(this IQueryable<TSource> source, int page, int pageSize) => pageSize < 1 ? source : source.Skip(pageSize * (page <= 0 ? 0 : page - 1)).Take(pageSize);
 
 		/// <summary>
 		/// 符合条件之后再查询

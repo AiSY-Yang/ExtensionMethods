@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace ExtensionMethods
 {
@@ -50,7 +51,7 @@ namespace ExtensionMethods
 		{
 			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Read(ref System.Text.Json.Utf8JsonReader, Type, System.Text.Json.JsonSerializerOptions)"/>
 			public override DateTime Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options) =>
-					DateTime.ParseExact(reader.GetString(), "yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+					DateTime.Parse(reader.GetString());
 			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Write(System.Text.Json.Utf8JsonWriter, T, System.Text.Json.JsonSerializerOptions)"/>
 			public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime dateTimeValue, System.Text.Json.JsonSerializerOptions options) =>
 					writer.WriteStringValue(dateTimeValue.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));

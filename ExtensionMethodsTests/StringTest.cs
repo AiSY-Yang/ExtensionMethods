@@ -144,7 +144,7 @@ namespace ExtensionMethodsTests
 		public void Decrypt()
 		{
 			#region DES
-			Assert.Throws<ArgumentException>(() => "".Decrypt(0, "12345678", "87654321"));
+			Assert.Throws<ArgumentNullException>(() => "".Decrypt(0, "12345678", "87654321"));
 			Assert.Equal("abcdefgh", "VrHKOUNsGcA=".Decrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
 			Assert.Equal("你好nh", "UFAZxUlQ7Pc=".Decrypt(EncryptOption.DES_CBC_None, "12345678", "87654321"));
 			Assert.Equal("a", "BUhZfGyF0Mw=".Decrypt(EncryptOption.DES_CBC_PKCS7, "12345678", "87654321"));
@@ -165,6 +165,7 @@ namespace ExtensionMethodsTests
 		[Fact]
 		public void ToDateTime()
 		{
+			Assert.Equal(DateTime.Parse("2006-01-02 14:04:05", null, System.Globalization.DateTimeStyles.AssumeUniversal), "2006-01-02T15:04:05.0000000+01:00".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "2006-01-02 15:04:05".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:00"), "2006-01-02 15:04".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-02 15:00:00"), "2006-01-02 15".ToDateTime());
@@ -175,7 +176,6 @@ namespace ExtensionMethodsTests
 			Assert.Equal(DateTime.Parse("2006-01-02 00:00:00"), "20060102".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "200601".ToDateTime());
 			Assert.Equal(DateTime.Parse("2006-02-01 00:00:00"), "200602".ToDateTime());
-			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "2006".ToDateTime());
 			Assert.Throws<FormatException>(() => "1".ToDateTime());
 
 			Assert.Equal(DateTime.Parse("2006-01-02 15:04:05"), "2006-01-02 15:04:05".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
@@ -192,6 +192,15 @@ namespace ExtensionMethodsTests
 
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "1".ToDateTime(DateTime.Parse("2006-01-01 00:00:00")));
 		}
+		[Fact]
+		public void ToDateTimeOffset()
+		{
+			Assert.Equal(DateTimeOffset.Parse("2006-01-02 06:04:05+00:00"), "2006-01-02 15:04:05+09:00".ToDateTimeOffset().ToUniversalTime());
+			Assert.Throws<FormatException>(() => "1".ToDateTime());
+
+			Assert.Equal(DateTimeOffset.Parse("2005-12-31 16:00:00+00:00"), "1".ToDateTimeOffset(DateTimeOffset.Parse("2006-01-01 00:00:00").ToUniversalTime()).ToUniversalTime());
+		}
+
 		[Fact]
 		public void ToInt()
 		{
@@ -215,7 +224,7 @@ namespace ExtensionMethodsTests
 		public void ToDouble()
 		{
 			Assert.Throws<FormatException>(() => "你好".ToDouble());
-			Assert.Throws<OverflowException>(() => "1.7976931348623157E+309".ToDouble());
+			Assert.Throws<OverflowException>(() => "17976931348623157E+309".ToDouble());
 			Assert.Equal(123, "123".ToDouble());
 			Assert.Equal(123, "123.".ToDouble());
 			Assert.Equal(123.123, "123.123".ToDouble());
@@ -235,6 +244,38 @@ namespace ExtensionMethodsTests
 		{
 			Assert.Equal("5L2g5aW9", "你好".ToBsae64String());
 		}
+
+		[Fact]
+		public void AsBase64ToStream()
+		{
+			var s = "5L2g5aW9".AsBase64ToStream();
+			s.Position = 0;
+			byte[] buffer = new byte[s.Length];
+			s.Read(buffer);
+			Assert.Equal("5L2g5aW9", buffer.ToBase64String());
+		}
+
+		[Theory]
+		[InlineData("AbbCddEff")]
+		[InlineData("abbCddEff")]
+		[InlineData("abb-Cdd-Eff")]
+		[InlineData("abb-Cdd_Eff")]
+		public void ToNamingConvention(string identifier)
+		{
+			Assert.Throws<InvalidEnumArgumentException>(() => identifier.ToNamingConvention(0));
+			Assert.Equal("abbcddeff", identifier.ToNamingConvention(NamingConvention.flatcase));
+			Assert.Equal("ABBCDDEFF", identifier.ToNamingConvention(NamingConvention.UPPERCASE));
+			Assert.Equal("abbCddEff", identifier.ToNamingConvention(NamingConvention.camelCase));
+			Assert.Equal("AbbCddEff", identifier.ToNamingConvention(NamingConvention.PascalCase));
+			Assert.Equal("abb_cdd_eff", identifier.ToNamingConvention(NamingConvention.snake_case));
+			Assert.Equal("abb_Cdd_Eff", identifier.ToNamingConvention(NamingConvention.camel_Snake_Case));
+			Assert.Equal("ABB_CDD_EFF", identifier.ToNamingConvention(NamingConvention.MACRO_CASE));
+			Assert.Equal("Abb_Cdd_Eff", identifier.ToNamingConvention(NamingConvention.Pascal_Snake_Case));
+			Assert.Equal("abb-cdd-eff", identifier.ToNamingConvention(NamingConvention.kebab一case));
+			Assert.Equal("ABB-CDD-EFF", identifier.ToNamingConvention(NamingConvention.TRAIN一CASE));
+			Assert.Equal("Abb-Cdd-Eff", identifier.ToNamingConvention(NamingConvention.Train一Case));
+		}
+
 		[Fact]
 		public void Convert()
 		{

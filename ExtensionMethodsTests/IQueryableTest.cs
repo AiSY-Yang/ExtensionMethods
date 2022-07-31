@@ -96,7 +96,7 @@ namespace ExtensionMethodsTests
 		[Fact]
 		public void Where()
 		{
-			var result = listForWhere.Where(true,x => x % 2 == 0).ToList();
+			var result = listForWhere.Where(true, x => x % 2 == 0).ToList();
 			Assert.Equal(2, result.Count);
 			Assert.Equal(2, result.First());
 			Assert.Equal(4, result.Last());
@@ -108,11 +108,14 @@ namespace ExtensionMethodsTests
 		[Fact]
 		public void Pageing()
 		{
-			//页码小于等于0不分页
+			//每页尺寸小于等于0不分页
 			Assert.Equal(7, listForPageing.Pageing(-1, -1).Count());
 			Assert.Equal(7, listForPageing.Pageing(-1, 0).Count());
 			Assert.Equal(7, listForPageing.Pageing(0, -1).Count());
 			Assert.Equal(7, listForPageing.Pageing(0, 0).Count());
+			Assert.Equal(7, listForPageing.Pageing(1, -1).Count());
+			Assert.Equal(7, listForPageing.Pageing(1, 0).Count());
+
 			//页号小于等于0返回第一页
 			Assert.Equal(1, listForPageing.Pageing(-1, 1).Count());
 			Assert.Equal(1, listForPageing.Pageing(0, 1).Count());
@@ -121,9 +124,25 @@ namespace ExtensionMethodsTests
 			Assert.Equal(2, listForPageing.Pageing(0, 2).Count());
 			Assert.Equal(2, listForPageing.Pageing(1, 2).Count());
 
+			//正常分页
+			Assert.Equal(1, listForPageing.Pageing(1, 1).Count());
+			Assert.Equal(2, listForPageing.Pageing(1, 2).Count());
 			Assert.Equal(2, listForPageing.Pageing(3, 2).Count());
 			Assert.Equal(1, listForPageing.Pageing(4, 2).Count());
 			Assert.Equal(7, listForPageing.Pageing(4, 2).First());
+		}
+		[Fact]
+		public void LeftJoin()
+		{
+			IQueryable<(int, int)> data1 = new List<(int, int)>() { (1, 2), (2, 3) }.AsQueryable();
+			IQueryable<(int, int)> data2 = new List<(int, int)>() { (1, 3), (4, 5) }.AsQueryable();
+			var q = data1.LeftJoin(data2, x => x.Item1, x => x.Item1, (x, y) => new { A = x.Item1, B = y.Item2 });
+			var res = q.ToList();
+			Assert.Equal(2, res.Count);
+			Assert.Equal(1, res[0].A);
+			Assert.Equal(3, res[0].B);
+			Assert.Equal(2, res[1].A);
+			Assert.Equal(0, res[1].B);
 		}
 	}
 }

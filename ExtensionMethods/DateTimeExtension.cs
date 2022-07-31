@@ -19,24 +19,26 @@ namespace ExtensionMethods
 		/// <param name="dateTime"></param>
 		/// <returns></returns>
 		public static long ToMilliSecondTimestamp(this DateTime dateTime) => (dateTime.ToUniversalTime().Ticks - 621355968000000000) / 1_0000;
+#if NET6_0_OR_GREATER
+		/// <summary>
+		/// 转换为DateOnly
+		/// </summary>
+		/// <param name="dateTime"></param>
+		/// <returns></returns>
+		public static DateOnly ToDateOnly(this DateTime dateTime) => DateOnly.FromDateTime(dateTime);
+#endif
 		/// <summary>
 		/// 返回当前日期所在月份的第一天
 		/// </summary>
 		/// <param name="dateTime"></param>
 		/// <returns></returns>
-		public static DateTime GetFirstDayOfMonth(this DateTime dateTime)
-		{
-			return new DateTime(dateTime.Year, dateTime.Month, 1);
-		}
+		public static DateTime GetFirstDayOfMonth(this DateTime dateTime) => new DateTime(dateTime.Year, dateTime.Month, 1);
 		/// <summary>
 		/// 返回当前日期所在月份最后一天
 		/// </summary>
 		/// <param name="dateTime"></param>
 		/// <returns></returns>
-		public static DateTime GetLastDayOfMonth(this DateTime dateTime)
-		{
-			return dateTime.GetFirstDayOfMonth().AddMonths(1).AddDays(-1);
-		}
+		public static DateTime GetLastDayOfMonth(this DateTime dateTime) => dateTime.GetFirstDayOfMonth().AddMonths(1).AddDays(-1);
 		/// <summary>
 		/// 对时间按照秒数取整,返回不大于指定时间且秒数为指定数字整数倍的时间,默认将秒数置0,毫秒部分被丢弃
 		/// </summary>

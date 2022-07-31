@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Security.Cryptography;
 
-namespace ExtensionMethods
+namespace ExtensionMethods.Common
 {
 	/// <summary>
 	/// 通用组件

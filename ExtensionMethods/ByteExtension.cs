@@ -164,6 +164,52 @@ namespace ExtensionMethods
 				}
 			}
 		}
+		/// <summary>
+		/// DES加密
+		/// </summary>
+		/// <param name="data">待加密数据</param>
+		/// <param name="secret">密钥</param>
+		/// <param name="iv">偏移量</param>
+		/// <param name="cipherMode">加密方式</param>
+		/// <param name="paddingMode">填充模式</param>
+		/// <returns>加密后的字节数据</returns>
+		public static byte[] DESEncrypt(this byte[] data, byte[] secret, byte[] iv, System.Security.Cryptography.CipherMode cipherMode, System.Security.Cryptography.PaddingMode paddingMode)
+		{
+			using var des = System.Security.Cryptography.DES.Create();
+			des.Key = secret;
+			des.IV = iv;
+			des.Mode = cipherMode;
+			des.Padding = paddingMode;
+			using System.Security.Cryptography.ICryptoTransform ct = des.CreateEncryptor();
+			using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
+			using var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write);
+			cs.Write(data, 0, data.Length);
+			cs.FlushFinalBlock();
+			return outStream.ToArray();
+		}
+		/// <summary>
+		/// DES解密
+		/// </summary>
+		/// <param name="data">待解密数据</param>
+		/// <param name="secret">密钥</param>
+		/// <param name="iv">偏移量</param>
+		/// <param name="cipherMode">加密方式</param>
+		/// <param name="paddingMode">填充模式</param>
+		/// <returns>解密后的字节数据</returns>
+		public static byte[] DESDecrypt(this byte[] data, byte[] secret, byte[] iv, System.Security.Cryptography.CipherMode cipherMode, System.Security.Cryptography.PaddingMode paddingMode)
+		{
+			using var des = System.Security.Cryptography.DES.Create();
+			des.Key = secret;
+			des.IV = iv;
+			des.Mode = cipherMode;
+			des.Padding = paddingMode;
+			using System.Security.Cryptography.ICryptoTransform ct = des.CreateDecryptor();
+			using System.IO.MemoryStream outStream = new System.IO.MemoryStream();
+			using var cs = new System.Security.Cryptography.CryptoStream(outStream, ct, System.Security.Cryptography.CryptoStreamMode.Write);
+			cs.Write(data, 0, data.Length);
+			cs.FlushFinalBlock();
+			return outStream.ToArray();
+		}
 	}
 	/// <summary>
 	/// CRC类别

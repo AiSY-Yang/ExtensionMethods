@@ -1,6 +1,4 @@
-﻿using ExtensionMethods;
-
-using System;
+﻿using ExtensionMethods.Common;
 
 using Xunit;
 
