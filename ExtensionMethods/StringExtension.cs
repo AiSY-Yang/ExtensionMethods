@@ -738,7 +738,7 @@ namespace ExtensionMethods
 		/// </summary>
 		Train一Case,
 		/// <summary>
-		/// Http Heade形式
+		/// HTTP Header形式
 		/// </summary>
 		HTTP一Header一Case = Train一Case,
 	}

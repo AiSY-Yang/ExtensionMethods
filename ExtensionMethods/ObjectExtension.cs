@@ -10,13 +10,7 @@ namespace ExtensionMethods
 	{
 		static ObjectExtension()
 		{
-			//添加一些自定义转换器
-			JsonConverterForType jsonConverterForType = new JsonConverterForType();
-			//标准序列化
-			JsonSerializerStandardOptions.Converters.Add(jsonConverterForType);
-
 			//带时间格式的序列化
-			JsonSerializerStandardOptionsWithCommonTimeFormat.Converters.Add(jsonConverterForType);
 			JsonSerializerStandardOptionsWithCommonTimeFormat.Converters.Add(new JsonConverterDateTimeStandard());
 		}
 #if DEBUG
@@ -56,32 +50,6 @@ namespace ExtensionMethods
 			public override void Write(System.Text.Json.Utf8JsonWriter writer, DateTime dateTimeValue, System.Text.Json.JsonSerializerOptions options) =>
 					writer.WriteStringValue(dateTimeValue.ToString("yyyy-MM-dd HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture));
 		}
-		/// <summary>
-		/// 解决Type类型的序列化
-		/// <a href="https://stackoverflow.com/questions/66919668/net-core-graphql-graphql-systemtextjson-serialization-and-deserialization-of/67001480">https://stackoverflow.com</a>
-		/// </summary>
-		class JsonConverterForType : System.Text.Json.Serialization.JsonConverter<Type>
-		{
-			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Read(ref System.Text.Json.Utf8JsonReader, Type, System.Text.Json.JsonSerializerOptions)"/>
-			public override Type Read(ref System.Text.Json.Utf8JsonReader reader, Type typeToConvert, System.Text.Json.JsonSerializerOptions options)
-			{
-				// Caution: Deserialization of type instances like this 
-				// is not recommended and should be avoided
-				// since it can lead to potential security issues.
-
-				// If you really want this supported (for instance if the JSON input is trusted):
-				// string assemblyQualifiedName = reader.GetString();
-				// return Type.GetType(assemblyQualifiedName);
-				throw new NotSupportedException();
-			}
-			/// <inheritdoc cref="System.Text.Json.Serialization.JsonConverter{T}.Write(System.Text.Json.Utf8JsonWriter, T, System.Text.Json.JsonSerializerOptions)"/>
-			public override void Write(System.Text.Json.Utf8JsonWriter writer, Type value, System.Text.Json.JsonSerializerOptions options)
-			{
-				string assemblyQualifiedName = value?.AssemblyQualifiedName;
-				// Use this with caution, since you are disclosing type information.
-				writer.WriteStringValue(assemblyQualifiedName);
-			}
-		}
 		#endregion
 
 		/// <summary>
@@ -94,7 +62,7 @@ namespace ExtensionMethods
 			IncludeFields = true,
 #endif
 			Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-		};
+		}.AddTypeConverter();
 
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 		/// <summary>
@@ -121,7 +89,7 @@ namespace ExtensionMethods
 			IncludeFields = true,
 #endif
 			Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-		};
+		}.AddTypeConverter();
 		/// <summary>
 		/// 将时间序列化为yyyy-MM-dd HH:mm:ss格式
 		/// </summary>
