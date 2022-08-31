@@ -20,6 +20,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="EPPlus" Version="5.6.2" />
+		<PackageReference Include="EPPlus" Version="6.0.6" />
 	</ItemGroup>
 </Project>

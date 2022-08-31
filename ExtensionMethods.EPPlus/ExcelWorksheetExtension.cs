@@ -1,7 +1,4 @@
-﻿using OfficeOpenXml;
-
-using System.Data;
-using System.Linq;
+﻿using System.Data;
 
 namespace ExtensionMethods.EPPlus
 {
@@ -51,6 +48,17 @@ namespace ExtensionMethods.EPPlus
 				}
 			}
 			return dt;
+		}
+		/// <summary>
+		/// 自适应列宽
+		/// </summary>
+		/// <param name="worksheet"></param>
+		public static void AutoFit(this OfficeOpenXml.ExcelWorksheet worksheet)
+		{
+			foreach (var item in worksheet.Columns)
+			{
+				item.AutoFit();
+			}
 		}
 	}
 }

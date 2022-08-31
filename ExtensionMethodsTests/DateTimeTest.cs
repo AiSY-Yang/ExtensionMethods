@@ -36,6 +36,34 @@ namespace ExtensionMethodsTests
 			Assert.Equal(DateTime.Parse("2001-02-28"), DateTime.Parse("2001-02-01").GetLastDayOfMonth());
 			Assert.Equal(DateTime.Parse("2004-02-29"), DateTime.Parse("2004-02-01").GetLastDayOfMonth());
 		}
+		[Theory]
+		[InlineData("1994-10-29", "1994-10-29", 0)]
+		[InlineData("1994-10-29", "1995-10-28", 0)]
+		[InlineData("1994-10-29", "1995-10-29", 1)]
+		[InlineData("1994-10-29", "1995-10-30", 1)]
+
+		[InlineData("1994-10-29", "2008-10-28", 13)]
+		[InlineData("1994-10-29", "2008-10-29", 14)]
+		[InlineData("1994-10-29", "2008-10-30", 14)]
+
+		[InlineData("1994-10-31", "2008-10-30", 13)]
+		[InlineData("1994-10-31", "2008-10-31", 14)]
+		[InlineData("1994-10-31", "2008-11-01", 14)]
+	
+		[InlineData("2000-02-28", "2000-02-29", 0)]
+		[InlineData("2000-02-28", "2004-02-27", 3)]
+		[InlineData("2000-02-28", "2004-02-28", 4)]
+		[InlineData("2000-02-28", "2004-02-29", 4)]
+		
+		[InlineData("2000-02-29", "2000-02-29", 0)]
+		[InlineData("2000-02-29", "2004-02-27", 3)]
+		[InlineData("2000-02-29", "2004-02-28", 3)]
+		[InlineData("2000-02-29", "2004-02-29", 4)]
+		public void GetAge(string birthday, string currentDay, int age)
+		{
+			Assert.Equal(age, DateTime.Parse(birthday).GetAge(DateTime.Parse(currentDay)));
+		}
+
 		[Fact]
 		public void TruncateSecend()
 		{

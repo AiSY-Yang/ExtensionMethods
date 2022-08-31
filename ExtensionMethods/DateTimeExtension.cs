@@ -39,6 +39,18 @@ namespace ExtensionMethods
 		/// <param name="dateTime"></param>
 		/// <returns></returns>
 		public static DateTime GetLastDayOfMonth(this DateTime dateTime) => dateTime.GetFirstDayOfMonth().AddMonths(1).AddDays(-1);
+
+		/// <inheritdoc cref="GetAge(DateTime, DateTime)"/>
+		public static int GetAge(this DateTime birthday) => birthday.GetAge(DateTime.Now);
+
+		/// <summary>
+		/// 获取年龄
+		/// </summary>
+		/// <param name="birthday">生日</param>
+		/// <param name="datetime">计算时间</param>
+		/// <returns></returns>
+		public static int GetAge(this DateTime birthday,DateTime datetime) => datetime.Year - birthday.Year + (((datetime.Month << 5) + datetime.Day - ((birthday.Month << 5) + birthday.Day)) >> 31);
+
 		/// <summary>
 		/// 对时间按照秒数取整,返回不大于指定时间且秒数为指定数字整数倍的时间,默认将秒数置0,毫秒部分被丢弃
 		/// </summary>
