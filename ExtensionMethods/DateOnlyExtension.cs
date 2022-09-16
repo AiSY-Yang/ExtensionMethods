@@ -29,6 +29,17 @@ namespace ExtensionMethods
 		/// <param name="time">时间</param>
 		/// <returns></returns>
 		public static DateTime AsLocalToDateTime(this DateOnly date, TimeOnly time) => date.ToDateTime(time, DateTimeKind.Local);
+
+		/// <inheritdoc cref="GetAge(DateOnly, DateOnly)"/>
+		public static int GetAge(this DateOnly birthday) => birthday.GetAge(DateOnly.FromDateTime(DateTime.Now));
+
+		/// <summary>
+		/// 获取年龄
+		/// </summary>
+		/// <param name="birthday">生日</param>
+		/// <param name="date">计算时间</param>
+		/// <returns></returns>
+		public static int GetAge(this DateOnly birthday, DateOnly date) => date.Year - birthday.Year + (((date.Month << 5) + date.Day - ((birthday.Month << 5) + birthday.Day)) >> 31);
 	}
 #endif
 }
