@@ -37,17 +37,17 @@ namespace ExtensionMethods
 					var xmlDocument = new System.Xml.XmlDocument();
 					xmlDocument.Load(streamReader);
 					var members = xmlDocument?["doc"]?["members"];
-					foreach (System.Xml.XmlNode item in members!.ChildNodes)
+					foreach (System.Xml.XmlNode? item in members!.ChildNodes)
 					{
 						Member member = new Member()
 						{
-							ID = item.Attributes?["name"]?.Value!
+							ID = item!.Attributes?["name"]?.Value!
 						};
-						foreach (System.Xml.XmlNode item2 in item.ChildNodes)
+						foreach (System.Xml.XmlNode? item2 in item.ChildNodes)
 						{
 							ContentNode node = new ContentNode()
 							{
-								Type = item2.Name,
+								Type = item2!.Name,
 								Name = item2.Attributes?["name"]?.Value,
 								Content = item2.InnerXml.Trim()
 							};

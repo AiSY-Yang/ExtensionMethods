@@ -10,7 +10,7 @@ namespace ExtensionMethods.JsonSerializerConverts
 	/// </summary>
 	class JsonConverterForType : JsonConverter<Type>
 	{
-		/// <inheritdoc cref="JsonConverter{T}.Read(ref Utf8JsonReader, Type, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override Type Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			// Caution: Deserialization of type instances like this 
@@ -22,7 +22,7 @@ namespace ExtensionMethods.JsonSerializerConverts
 			// return Type.GetType(assemblyQualifiedName);
 			throw new NotSupportedException();
 		}
-		/// <inheritdoc cref="JsonConverter{T}.Write(Utf8JsonWriter, T, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options)
 		{
 			string assemblyQualifiedName = value?.AssemblyQualifiedName;

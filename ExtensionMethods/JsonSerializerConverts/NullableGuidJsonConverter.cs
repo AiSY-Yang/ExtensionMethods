@@ -9,7 +9,7 @@ namespace ExtensionMethods.JsonSerializerConverts
 	/// </summary>
 	public class NullableGuidJsonConverter : JsonConverter<Guid?>
 	{
-		/// <inheritdoc cref="JsonConverter{T}.Read(ref Utf8JsonReader, Type, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override Guid? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			var value = reader.GetString();
@@ -18,7 +18,7 @@ namespace ExtensionMethods.JsonSerializerConverts
 			else
 				return Guid.Parse(value);
 		}
-		/// <inheritdoc cref="JsonConverter{T}.Write(Utf8JsonWriter, T, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override void Write(Utf8JsonWriter writer, Guid? value, JsonSerializerOptions options)
 		{
 			if (value == null)

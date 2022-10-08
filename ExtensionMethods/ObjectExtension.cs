@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net.Sockets;
 
 namespace ExtensionMethods
 {
@@ -114,6 +115,10 @@ namespace ExtensionMethods
 		/// <param name="dataRow"></param>
 		public static T FillPropertiesWithDataRow<T>(this T obj, System.Data.DataRow dataRow)
 		{
+			if (obj is null)
+			{
+				throw new System.ArgumentNullException(nameof(obj));
+			};
 			System.Reflection.PropertyInfo[] ps = obj.GetType().GetProperties();
 			foreach (var item in ps)
 			{
@@ -122,13 +127,13 @@ namespace ExtensionMethods
 					item.SetValue(obj, item.GetValue(obj) switch
 					{
 						// pattern-matching 不支持 Nullable 所有的nullable类型都会被null匹配 所以nullable对象在Model中的类型和长度必须与Datatable中的一模一样
-						short => dataRow[item.Name] == DBNull.Value ? null : short.Parse(dataRow[item.Name].ToString()),
-						int => dataRow[item.Name] == DBNull.Value ? null : int.Parse(dataRow[item.Name].ToString()),
-						long => dataRow[item.Name] == DBNull.Value ? null : long.Parse(dataRow[item.Name].ToString()),
-						decimal => dataRow[item.Name] == DBNull.Value ? null : decimal.Parse(dataRow[item.Name].ToString()),
-						float => dataRow[item.Name] == DBNull.Value ? null : float.Parse(dataRow[item.Name].ToString()),
-						double => dataRow[item.Name] == DBNull.Value ? null : double.Parse(dataRow[item.Name].ToString()),
-						DateTime => dataRow[item.Name] == DBNull.Value ? null : DateTime.Parse(dataRow[item.Name].ToString()),
+						short => dataRow[item.Name] == DBNull.Value ? null : short.Parse(dataRow[item.Name].ToString() ?? "0"),
+						int => dataRow[item.Name] == DBNull.Value ? null : int.Parse(dataRow[item.Name].ToString() ?? "0"),
+						long => dataRow[item.Name] == DBNull.Value ? null : long.Parse(dataRow[item.Name].ToString() ?? "0"),
+						decimal => dataRow[item.Name] == DBNull.Value ? null : decimal.Parse(dataRow[item.Name].ToString() ?? "0"),
+						float => dataRow[item.Name] == DBNull.Value ? null : float.Parse(dataRow[item.Name].ToString() ?? "0"),
+						double => dataRow[item.Name] == DBNull.Value ? null : double.Parse(dataRow[item.Name].ToString() ?? "0"),
+						DateTime => dataRow[item.Name] == DBNull.Value ? null : DateTime.Parse(dataRow[item.Name].ToString() ?? "0"),
 						//如果可以解析为数字 则数字不为0为true
 						bool => dataRow[item.Name] == DBNull.Value ? null : (int.TryParse(dataRow[item.Name].ToString(), out int i) && i != 0) || (bool.TryParse(dataRow[item.Name].ToString(), out bool b) && b),
 						//字符串会被null匹配而不是string

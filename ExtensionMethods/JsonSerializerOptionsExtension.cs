@@ -39,14 +39,6 @@ namespace ExtensionMethods
 		public static JsonSerializerOptions AddDateOnlyJsonConverter(this JsonSerializerOptions options)
 		{
 			options.Converters.Add(new DateOnlyJsonConverter());
-			return options;
-		}
-		/// <summary>
-		/// 添加可空日期转换器 如果传入空字符串则转换为null
-		/// </summary>
-		/// <param name="options"></param>
-		public static JsonSerializerOptions AddNullableDateOnlyJsonConverter(this JsonSerializerOptions options)
-		{
 			options.Converters.Add(new NullableDateOnlyJsonConverter());
 			return options;
 		}
@@ -57,14 +49,6 @@ namespace ExtensionMethods
 		public static JsonSerializerOptions AddTimeOnlyJsonConverter(this JsonSerializerOptions options)
 		{
 			options.Converters.Add(new TimeOnlyJsonConverter());
-			return options;
-		}
-		/// <summary>
-		/// 添加可空日期转换器 如果传入空字符串则转换为null
-		/// </summary>
-		/// <param name="options"></param>
-		public static JsonSerializerOptions AddNullableTimeOnlyJsonConverter(this JsonSerializerOptions options)
-		{
 			options.Converters.Add(new NullableTimeOnlyJsonConverter());
 			return options;
 		}

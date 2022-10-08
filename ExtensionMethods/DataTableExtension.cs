@@ -28,20 +28,20 @@ namespace ExtensionMethods
 			strHTMLBuilder.Append("\t\t<table border='1px' cellpadding='3' cellspacing='0' style='font-family:Garamond; font-size:smaller'>\r\n");
 
 			strHTMLBuilder.Append("\t\t\t<tr>\r\n");
-			foreach (DataColumn myColumn in dataTable.Columns)
+			foreach (DataColumn? myColumn in dataTable.Columns)
 			{
 				strHTMLBuilder.Append("\t\t\t\t<td>");
-				strHTMLBuilder.Append(myColumn.ColumnName);
+				strHTMLBuilder.Append(myColumn!.ColumnName);
 				strHTMLBuilder.Append("</td>\r\n");
 			}
 			strHTMLBuilder.Append("\t\t\t</tr>\r\n");
-			foreach (DataRow myRow in dataTable.Rows)
+			foreach (DataRow? myRow in dataTable.Rows)
 			{
 				strHTMLBuilder.Append("\t\t\t<tr>");
-				foreach (DataColumn myColumn in dataTable.Columns)
+				foreach (DataColumn? myColumn in dataTable.Columns)
 				{
 					strHTMLBuilder.Append("<td>");
-					strHTMLBuilder.Append(myRow[myColumn.ColumnName].ToString());
+					strHTMLBuilder.Append(myRow![myColumn!.ColumnName].ToString());
 					strHTMLBuilder.Append("</td>");
 				}
 				strHTMLBuilder.Append("</tr>\r\n");
@@ -53,7 +53,7 @@ namespace ExtensionMethods
 			return Htmltext;
 		}
 		/// <summary>
-		/// 返回Insert Into语句,表名为DataTable的TableName字段,当表行数为0的时候返回"select 1"
+		/// 返回MySQL的insert into语句,表名为DataTable的TableName字段,当表行数为0的时候返回"select 1"
 		/// </summary>
 		/// <param name="dataTable"></param>
 		/// <param name="Replace"> <code>true</code>replace into DataTable.TableName<code>false</code>insert ignore into DataTable.TableName</param>
@@ -81,7 +81,8 @@ namespace ExtensionMethods
 						case string str: fields.Add("'" + str + "'"); break;
 						case DateTime time: fields.Add("'" + time.ToString("yyyy-MM-dd HH:mm:ss") + "'"); break;
 						case DBNull _: fields.Add("null"); break;
-						default: fields.Add(field.ToString()); break;
+						case null: fields.Add("null"); break;
+						default: fields.Add(field.ToString() ?? "null"); break;
 					}
 				}
 				rows.Add("(" + string.Join(",", fields) + ")");

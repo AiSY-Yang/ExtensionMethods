@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.1;netcoreapp3.1;net5.0;net6.0</TargetFrameworks>
 		<Version>1.0.4</Version>
-		<Nullable>annotations</Nullable>
+		<Nullable>enable</Nullable>
 		<RunPostBuildEvent>OnOutputUpdated</RunPostBuildEvent>
 		<Authors>AiSY-Yang</Authors>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>

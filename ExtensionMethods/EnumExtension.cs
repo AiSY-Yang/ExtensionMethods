@@ -8,13 +8,14 @@ namespace ExtensionMethods
 	public static class EnumExtension
 	{
 		/// <summary>
-		/// 通过反射获取枚举的描述 如果不存在描述则返回字符串
+		/// 通过反射获取枚举的描述 如果不存在描述则返回字符串 如果不是有效枚举值返回枚举数值
 		/// </summary>
 		/// <param name="source"></param>
 		/// <returns></returns>
 		public static string GetDescription(this Enum source)
 		{
 			System.Reflection.FieldInfo fi = source.GetType().GetField(source.ToString());
+			if (fi == null) return source.ToString();
 			System.ComponentModel.DescriptionAttribute[] attributes = (System.ComponentModel.DescriptionAttribute[])fi.GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
 
 			if (attributes != null && attributes.Length > 0) return attributes[0].Description;

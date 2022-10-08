@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 namespace ExtensionMethods.JsonSerializerConverts
 {
+#if NET5_0_OR_GREATER
 	/// <summary>
 	/// 枚举转换器 将枚举转换为Description所定义的内容
 	/// </summary>
@@ -35,10 +36,12 @@ namespace ExtensionMethods.JsonSerializerConverts
 		static string GetDescription(Enum source)
 		{
 			System.Reflection.FieldInfo fi = source.GetType().GetField(source.ToString());
+			if (fi == null) return source.ToString();
 			System.ComponentModel.DescriptionAttribute[] attributes = (System.ComponentModel.DescriptionAttribute[])fi.GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
 
 			if (attributes != null && attributes.Length > 0) return attributes[0].Description;
 			else return source.ToString();
 		}
 	}
+#endif
 }

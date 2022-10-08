@@ -26,7 +26,7 @@ namespace ExtensionMethods
 			{
 				//排除需要忽略的属性
 				var key = (item.GetCustomAttributes(typeof(JsonPropertyNameAttribute), true).FirstOrDefault() as JsonPropertyNameAttribute)?.Name;
-				if (key == null) key = item.Name;
+				key ??= item.Name;
 				if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), true).FirstOrDefault() is JsonIgnoreAttribute ignoreAttribute)
 				{
 					switch (ignoreAttribute.Condition)

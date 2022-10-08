@@ -76,8 +76,8 @@ namespace ExtensionMethods
 				System.Type typeY = y.Current.GetType();
 				if (!typeX.Equals(typeY))
 					return false;
-				if (typeof(System.Collections.IEnumerable).IsAssignableFrom(typeX))
-					if (!ContentEquals(x.Current as System.Collections.IEnumerable, y.Current as System.Collections.IEnumerable))
+				if (typeX is System.Collections.IEnumerable xx && typeY is System.Collections.IEnumerable yy)
+					if (!ContentEquals(xx, yy))
 						return false;
 				if (!x.Current.Equals(y.Current))
 					return false;

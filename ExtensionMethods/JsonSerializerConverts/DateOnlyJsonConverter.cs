@@ -10,14 +10,14 @@ namespace ExtensionMethods.JsonSerializerConverts
 	/// </summary>
 	public class DateOnlyJsonConverter : JsonConverter<DateOnly>
 	{
-		/// <inheritdoc cref="JsonConverter{T}.Read(ref Utf8JsonReader, Type, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override DateOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			var value = reader.GetString();
-			if (value == null) return default(DateOnly);
+			if (value == null) return default;
 			return DateOnly.Parse(value);
 		}
-		/// <inheritdoc cref="JsonConverter{T}.Write(Utf8JsonWriter, T, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions options)
 		{
 			string value2 = value.ToString("yyyy-MM-dd");

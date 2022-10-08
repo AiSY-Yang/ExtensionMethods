@@ -10,14 +10,14 @@ namespace ExtensionMethods.JsonSerializerConverts
 	/// </summary>
 	public class TimeOnlyJsonConverter : JsonConverter<TimeOnly>
 	{
-		/// <inheritdoc cref="JsonConverter{T}.Read(ref Utf8JsonReader, Type, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override TimeOnly Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
 		{
 			var value = reader.GetString();
-			if (value == null) return default(TimeOnly);
+			if (value == null) return default;
 			return TimeOnly.Parse(value);
 		}
-		/// <inheritdoc cref="JsonConverter{T}.Write(Utf8JsonWriter, T, JsonSerializerOptions)"/>
+		/// <inheritdoc/>
 		public override void Write(Utf8JsonWriter writer, TimeOnly value, JsonSerializerOptions options)
 		{
 			string value2 = value.ToString("HH:mm:ss");

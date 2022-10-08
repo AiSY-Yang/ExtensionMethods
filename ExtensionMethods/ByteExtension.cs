@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+
+using Microsoft.Extensions.Logging;
 
 namespace ExtensionMethods
 {
@@ -120,9 +124,10 @@ namespace ExtensionMethods
 		/// </summary>
 		/// <param name="byteArray"></param>
 		/// <param name="hashOption"></param>
-		/// <param name="secret">HMAC形式的HASH计算需要密钥</param>
 		/// <returns></returns>
-		public static byte[] Hash(this byte[] byteArray, HashOption hashOption, byte[] secret = null)
+		/// <exception cref="System.ArgumentException"></exception>
+		/// <exception cref="System.ComponentModel.InvalidEnumArgumentException"></exception>
+		public static byte[] Hash(this byte[] byteArray, HashOption hashOption)
 		{
 			switch (hashOption)
 			{
@@ -139,31 +144,55 @@ namespace ExtensionMethods
 				case HashOption.SHA512:
 					return System.Security.Cryptography.SHA512.Create().ComputeHash(byteArray);
 				case HashOption.HmacMD5:
-					NullCheck();
+				case HashOption.HmacSHA1:
+				case HashOption.HmacSHA256:
+				case HashOption.HmacSHA384:
+				case HashOption.HmacSHA512:
+					throw new System.ArgumentException("for Hmac algorithm,The secret is necessary");
+				default:
+					throw new System.ComponentModel.InvalidEnumArgumentException(nameof(HashOption), (int)hashOption, typeof(HashOption));
+			}
+		}
+
+		/// <summary>
+		/// 计算HASH
+		/// </summary>
+		/// <param name="byteArray"></param>
+		/// <param name="hashOption"></param>
+		/// <param name="secret">HMAC形式的HASH计算需要密钥</param>
+		/// <returns></returns>
+		/// <exception cref="System.ArgumentNullException"></exception>
+		/// <exception cref="System.ComponentModel.InvalidEnumArgumentException"></exception>
+		public static byte[] Hash(this byte[] byteArray, HashOption hashOption, byte[] secret)
+		{
+			if (secret is null)
+			{
+				throw new System.ArgumentNullException(nameof(secret), "for Hmac algorithm,The secret is necessary");
+			}
+			switch (hashOption)
+			{
+				case HashOption.MD5_16:
+				case HashOption.MD5_32:
+				case HashOption.SHA1:
+				case HashOption.SHA256:
+				case HashOption.SHA384:
+				case HashOption.SHA512:
+					return byteArray.Hash(hashOption);
+				case HashOption.HmacMD5:
 					return new System.Security.Cryptography.HMACMD5(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA1:
-					NullCheck();
 					return new System.Security.Cryptography.HMACSHA1(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA256:
-					NullCheck();
 					return new System.Security.Cryptography.HMACSHA256(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA384:
-					NullCheck();
 					return new System.Security.Cryptography.HMACSHA384(secret).ComputeHash(byteArray);
 				case HashOption.HmacSHA512:
-					NullCheck();
 					return new System.Security.Cryptography.HMACSHA512(secret).ComputeHash(byteArray);
 				default:
 					throw new System.ComponentModel.InvalidEnumArgumentException(nameof(HashOption), (int)hashOption, typeof(HashOption));
 			}
-			void NullCheck()
-			{
-				if (secret is null)
-				{
-					throw new System.ArgumentNullException(nameof(secret), "for Hmac algorithm,The secret is necessary");
-				}
-			}
 		}
+
 		/// <summary>
 		/// DES加密
 		/// </summary>
