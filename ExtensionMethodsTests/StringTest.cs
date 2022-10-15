@@ -95,11 +95,11 @@ namespace ExtensionMethodsTests
 		public void Hash()
 		{
 			Assert.Throws<InvalidEnumArgumentException>(() => "".Hash((HashOption)(-1)));
-			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacMD5));
-			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacSHA1));
-			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacSHA256));
-			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacSHA384));
-			Assert.Throws<ArgumentNullException>(() => "".Hash(HashOption.HmacSHA512));
+			Assert.Throws<ArgumentException>(() => "".Hash(HashOption.HmacMD5));
+			Assert.Throws<ArgumentException>(() => "".Hash(HashOption.HmacSHA1));
+			Assert.Throws<ArgumentException>(() => "".Hash(HashOption.HmacSHA256));
+			Assert.Throws<ArgumentException>(() => "".Hash(HashOption.HmacSHA384));
+			Assert.Throws<ArgumentException>(() => "".Hash(HashOption.HmacSHA512));
 			Assert.Equal("611fc919a5d54f0f", "qwe".Hash(HashOption.MD5_16));
 			Assert.Equal("0d3389d9dea66ae1", "你好".Hash(HashOption.MD5_16));
 			Assert.Equal("76d80224611fc919a5d54f0ff9fba446", "qwe".Hash(HashOption.MD5_32));

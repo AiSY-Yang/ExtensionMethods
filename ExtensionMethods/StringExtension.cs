@@ -78,7 +78,10 @@ namespace ExtensionMethods
 		public static string CRC(this string _string, CrcOption crcOption) => Encoding.UTF8.GetBytes(_string).CRC(crcOption);
 
 		///<inheritdoc cref="ByteExtension.Hash(byte[], HashOption, byte[])"/>
-		public static string Hash(this string _string, HashOption hashOption, string secret = null) => Encoding.UTF8.GetBytes(_string).Hash(hashOption, secret?.ToByteArray()).ToHexString();
+		public static string Hash(this string _string, HashOption hashOption) => Encoding.UTF8.GetBytes(_string).Hash(hashOption).ToHexString();
+
+		///<inheritdoc cref="ByteExtension.Hash(byte[], HashOption, byte[])"/>
+		public static string Hash(this string _string, HashOption hashOption, string secret) => Encoding.UTF8.GetBytes(_string).Hash(hashOption, secret.ToByteArray()).ToHexString();
 
 		/// <summary>
 		/// 字符串加密
@@ -90,7 +93,7 @@ namespace ExtensionMethods
 		/// <returns>base64编码的结果</returns>
 		/// <exception cref="ArgumentException">Thrown when string is null or empty.</exception>
 		[Obsolete("更改为独立的方法 DESEncrypt")]
-		public static string Encrypt(this string _string, EncryptOption encryptOption, string secret = null, string iv = null)
+		public static string Encrypt(this string _string, EncryptOption encryptOption, string? secret = null, string? iv = null)
 		{
 			if (string.IsNullOrEmpty(_string))
 				throw new ArgumentException("String is null or empty");
@@ -138,7 +141,7 @@ namespace ExtensionMethods
 		/// <param name="iv">偏移量</param>
 		/// <returns></returns>
 		[Obsolete("更改为独立的方法 DESEncrypt")]
-		public static string Decrypt(this string _string, EncryptOption decryptOption, string secret = null, string iv = null)
+		public static string Decrypt(this string _string, EncryptOption decryptOption, string? secret = null, string? iv = null)
 		{
 			if (string.IsNullOrEmpty(_string))
 				throw new ArgumentNullException(nameof(_string));
@@ -391,7 +394,12 @@ namespace ExtensionMethods
 			{
 				try
 				{
-					return (T)converter.ConvertFromString(str);
+					var res = converter.ConvertFromString(str);
+					if (res == null)
+					{
+						throw new ArgumentNullException();
+					}
+					return (T)res;
 				}
 				catch (Exception)
 				{

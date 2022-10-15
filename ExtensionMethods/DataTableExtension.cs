@@ -71,8 +71,17 @@ namespace ExtensionMethods
 			{
 				return "select 1";
 			}
+#if NETCOREAPP3_1
+			foreach (DataRow? row in dataTable.Rows)
+			{
+				if (row == null)
+				{
+					throw new ArgumentNullException();
+				}
+#else
 			foreach (DataRow row in dataTable.Rows)
 			{
+#endif
 				List<string> fields = new List<string>();
 				foreach (var field in row.ItemArray)
 				{
@@ -90,10 +99,21 @@ namespace ExtensionMethods
 			if (IncludeColumnName)
 			{
 				List<string> cols = new List<string>();
+#if NETCOREAPP3_1
+				foreach (DataColumn? item in dataTable.Columns)
+				{
+					if (item == null)
+					{
+						throw new ArgumentNullException("datetable's column is null");
+					}
+					cols.Add(item.ColumnName);
+				}
+#else
 				foreach (DataColumn item in dataTable.Columns)
 				{
 					cols.Add(item.ColumnName);
 				}
+#endif
 				return $@"{(Replace ? "replace" : "insert ignore")} into {dataTable.TableName} ({string.Join(",", cols)}) values
 {string.Join(",\r\n", rows)}";
 			}

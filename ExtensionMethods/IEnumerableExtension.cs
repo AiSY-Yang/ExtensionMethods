@@ -72,6 +72,12 @@ namespace ExtensionMethods
 				bool hasNextY = y.MoveNext();
 				if (!hasNextX || !hasNextY)
 					return hasNextX == hasNextY;
+#if NETCOREAPP3_1
+				if (x.Current == null || y.Current == null)
+				{
+					throw new ArgumentNullException();
+				}
+#endif
 				System.Type typeX = x.Current.GetType();
 				System.Type typeY = y.Current.GetType();
 				if (!typeX.Equals(typeY))
