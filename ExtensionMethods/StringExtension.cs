@@ -609,7 +609,7 @@ namespace ExtensionMethods
 						}
 						break;
 					case System.Text.Json.JsonValueKind.Number:
-						if (property.Value.ToString().Contains('.'))
+						if (property.Value.ToString()!.Contains('.'))
 							ls.Add($"{new string('\t', level)}public double {property.Name} {{get;set;}}\r\n");
 						else
 							ls.Add($"{new string('\t', level)}public int {property.Name} {{get;set;}}\r\n");

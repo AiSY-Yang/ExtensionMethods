@@ -21,7 +21,7 @@ namespace ExtensionMethods
 		/// <summary>
 		/// 下载进度
 		/// </summary>
-		public static event Action<int> ShowDownloadPercent;
+		public static event Action<int>? ShowDownloadPercent;
 		/// <summary>
 		/// 下载完成
 		/// </summary>

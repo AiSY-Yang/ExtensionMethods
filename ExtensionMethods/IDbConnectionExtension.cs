@@ -94,7 +94,7 @@ namespace ExtensionMethods
 					cmd.Parameters.Add(parameter);
 				}
 			}
-			return cmd as System.Data.Common.DbCommand;
+			return (System.Data.Common.DbCommand)cmd;
 		}
 
 		#region 同步调用相关方法
@@ -121,7 +121,7 @@ namespace ExtensionMethods
 		public static long ExecRowCount(this IDbConnection dbConnection, string sql, Dictionary<string, object> paramDict)
 		{
 			using IDbCommand cmd = dbConnection.GenerateCmd($@"select count(*) from ({sql}) countTable", paramDict);
-			return (long)cmd.ExecuteScalar();
+			return (long)cmd.ExecuteScalar()!;
 		}
 
 		/// <inheritdoc cref="ExecSQL(IDbConnection, string, Dictionary{string, object})"/>
@@ -206,7 +206,7 @@ namespace ExtensionMethods
 		{
 			using var cmd = dbConnection.GenerateCmd($@"select count(*) from ({sql}) countTable", paramDict);
 			var result = await cmd.ExecuteScalarAsync();
-			return (long)result;
+			return (long)result!;
 		}
 
 		/// <inheritdoc cref="ExecSQLAsync(IDbConnection, string, Dictionary{string, object})"/>
