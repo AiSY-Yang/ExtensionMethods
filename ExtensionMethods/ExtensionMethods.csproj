@@ -29,35 +29,53 @@
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard2.1|AnyCPU'">
 	  <DebugType>embedded</DebugType>
 	  <WarningLevel>4</WarningLevel>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.1|AnyCPU'">
 	  <DebugType>embedded</DebugType>
 	  <WarningLevel>4</WarningLevel>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netcoreapp3.1|AnyCPU'">
 	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netcoreapp3.1|AnyCPU'">
 	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net5.0|AnyCPU'">
 	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net5.0|AnyCPU'">
 	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net6.0|AnyCPU'">
 	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net6.0|AnyCPU'">
 	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net7.0|AnyCPU'">
+	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0|AnyCPU'">
+	  <DebugType>embedded</DebugType>
+	  <NoWarn>1701;1702;NETSDK1138</NoWarn>
 	</PropertyGroup>
 
 

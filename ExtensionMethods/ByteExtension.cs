@@ -134,15 +134,35 @@ namespace ExtensionMethods
 				case HashOption.MD5_16:
 					return byteArray.Hash(HashOption.MD5_32)[4..12];
 				case HashOption.MD5_32:
+#if NET5_0_OR_GREATER
+					return System.Security.Cryptography.MD5.HashData(byteArray);
+#else
 					return System.Security.Cryptography.MD5.Create().ComputeHash(byteArray);
+#endif
 				case HashOption.SHA1:
+#if NET5_0_OR_GREATER
+					return System.Security.Cryptography.SHA1.HashData(byteArray);
+#else
 					return System.Security.Cryptography.SHA1.Create().ComputeHash(byteArray);
+#endif
 				case HashOption.SHA256:
+#if NET5_0_OR_GREATER
+					return System.Security.Cryptography.SHA256.HashData(byteArray);
+#else
 					return System.Security.Cryptography.SHA256.Create().ComputeHash(byteArray);
+#endif
 				case HashOption.SHA384:
+#if NET5_0_OR_GREATER
+					return System.Security.Cryptography.SHA384.HashData(byteArray);
+#else
 					return System.Security.Cryptography.SHA384.Create().ComputeHash(byteArray);
+#endif
 				case HashOption.SHA512:
+#if NET5_0_OR_GREATER
+					return System.Security.Cryptography.SHA512.HashData(byteArray);
+#else
 					return System.Security.Cryptography.SHA512.Create().ComputeHash(byteArray);
+#endif
 				case HashOption.HmacMD5:
 				case HashOption.HmacSHA1:
 				case HashOption.HmacSHA256:
@@ -158,8 +178,8 @@ namespace ExtensionMethods
 		/// 计算HASH
 		/// </summary>
 		/// <param name="byteArray"></param>
-		/// <param name="hashOption"></param>
-		/// <param name="secret">HMAC形式的HASH计算需要密钥</param>
+		/// <param name="hashOption">Hash选项</param>
+		/// <param name="secret">密钥</param>
 		/// <returns></returns>
 		/// <exception cref="System.ArgumentNullException"></exception>
 		/// <exception cref="System.ComponentModel.InvalidEnumArgumentException"></exception>

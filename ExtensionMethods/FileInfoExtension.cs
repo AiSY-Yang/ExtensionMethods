@@ -57,7 +57,7 @@ namespace ExtensionMethods
 			try
 			{
 				long startPosition = 0;
-				FileStream writeStream = null;
+				FileStream? writeStream = null;
 				if (string.IsNullOrEmpty(url))
 					throw new ArgumentNullException(nameof(url), "the url is null or empty");
 				if (string.IsNullOrEmpty(localfileReal))
@@ -126,8 +126,7 @@ namespace ExtensionMethods
 				}
 				finally
 				{
-					if (writeStream != null)
-						writeStream.Close();
+					writeStream?.Close();
 					DownloadFileOk(localfileReal, localfileWithSuffix);
 				}
 			}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -9,7 +10,7 @@ namespace ExtensionMethods
 	/// <summary>
 	/// 字符串扩展函数
 	/// </summary>
-	public static class StringExtension
+	public static partial class StringExtension
 	{
 		/// <summary>
 		/// 移除开始指定字符串
@@ -43,12 +44,20 @@ namespace ExtensionMethods
 		/// <returns></returns>
 		public static bool Contains(this string str, IEnumerable<string> shortStringArray) => shortStringArray.Any(item => str.Contains(item));
 
+#if NET7_0_OR_GREATER
+		[System.Text.RegularExpressions.GeneratedRegex("[\\u4e00-\\u9fa5]")]
+		private static partial System.Text.RegularExpressions.Regex MyRegex();
+#endif
 		/// <summary>
 		/// 删除字符串中的中文
 		/// </summary>
 		public static string RemoveChineseChar(this string str)
 		{
+#if NET7_0_OR_GREATER
+			if (MyRegex().IsMatch(str))
+#else
 			if (System.Text.RegularExpressions.Regex.IsMatch(str, @"[\u4e00-\u9fa5]"))
+#endif
 			{
 				StringBuilder stringBuilder = new StringBuilder();
 				foreach (var item in str)
@@ -69,10 +78,10 @@ namespace ExtensionMethods
 		}
 
 		///<inheritdoc cref="string.IsNullOrEmpty(string)"/>
-		public static bool IsNullOrEmpty(this string inputStr) => string.IsNullOrEmpty(inputStr);
+		public static bool IsNullOrEmpty([NotNullWhen(false)] this string? inputStr) => string.IsNullOrEmpty(inputStr);
 
 		///<inheritdoc cref="string.IsNullOrWhiteSpace(string)"/>
-		public static bool IsNullOrWhiteSpace(this string inputStr) => string.IsNullOrWhiteSpace(inputStr);
+		public static bool IsNullOrWhiteSpace([NotNullWhen(false)] this string? inputStr) => string.IsNullOrWhiteSpace(inputStr);
 
 		///<inheritdoc cref="ByteExtension.CRC(byte[], CrcOption)"/>
 		public static string CRC(this string _string, CrcOption crcOption) => Encoding.UTF8.GetBytes(_string).CRC(crcOption);
@@ -387,7 +396,11 @@ namespace ExtensionMethods
 		/// <param name="str"></param>
 		/// <returns></returns>
 		/// <exception cref="InvalidCastException">转换失败</exception>
+#if NET5_0_OR_GREATER
+		public static T? Convert<T>(this string str)
+#else
 		public static T Convert<T>(this string str)
+#endif
 		{
 			var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(T));
 			try
@@ -397,7 +410,7 @@ namespace ExtensionMethods
 					var res = converter.ConvertFromString(str);
 					if (res == null)
 					{
-						throw new ArgumentNullException();
+						throw new Exception();
 					}
 					return (T)res;
 				}
@@ -505,13 +518,19 @@ namespace ExtensionMethods
 			//允许尾随逗号
 			AllowTrailingCommas = true,
 		};
+
 		/// <summary>
 		/// 把字符串当作json转换到指定类型
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
 		/// <param name="json"></param>
 		/// <returns></returns>
-		public static T AsJsonToObject<T>(this string json) => System.Text.Json.JsonSerializer.Deserialize<T>(json, JsonDeserializeOptions);
+#if NET5_0_OR_GREATER
+		public static T? AsJsonToObject<T>(this string json) => System.Text.Json.JsonSerializer.Deserialize<T>(json, JsonDeserializeOptions);
+#else
+		public static T AsJsonToObject<T>(this string json) => System.Text.Json.JsonSerializer.Deserialize<T>(json, JsonDeserializeOptions)!;
+#endif
+
 		/// <summary>
 		/// 把字符串当作json转换到指定类型
 		/// </summary>
@@ -519,7 +538,11 @@ namespace ExtensionMethods
 		/// <param name="json"></param>
 		/// <param name="jsonSerializerOptions">反序列化选项</param>
 		/// <returns></returns>
-		public static T AsJsonToObject<T>(this string json, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) => System.Text.Json.JsonSerializer.Deserialize<T>(json, jsonSerializerOptions);
+#if NET5_0_OR_GREATER
+		public static T? AsJsonToObject<T>(this string json, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) => System.Text.Json.JsonSerializer.Deserialize<T>(json, jsonSerializerOptions);
+#else
+		public static T AsJsonToObject<T>(this string json, System.Text.Json.JsonSerializerOptions jsonSerializerOptions) => System.Text.Json.JsonSerializer.Deserialize<T>(json, jsonSerializerOptions)!;
+#endif
 
 		/// <summary>
 		/// 把字符串当作json转换为类定义字符串,保留大小写,对象为嵌套类且属性已进行初始化

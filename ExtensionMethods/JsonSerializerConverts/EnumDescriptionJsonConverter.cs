@@ -35,7 +35,7 @@ namespace ExtensionMethods.JsonSerializerConverts
 		/// <returns></returns>
 		static string GetDescription(Enum source)
 		{
-			System.Reflection.FieldInfo fi = source.GetType().GetField(source.ToString());
+			System.Reflection.FieldInfo? fi = source.GetType().GetField(source.ToString());
 			if (fi == null) return source.ToString();
 			System.ComponentModel.DescriptionAttribute[] attributes = (System.ComponentModel.DescriptionAttribute[])fi.GetCustomAttributes(typeof(System.ComponentModel.DescriptionAttribute), false);
 

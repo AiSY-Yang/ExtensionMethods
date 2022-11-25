@@ -22,9 +22,9 @@ namespace ExtensionMethods
 		public static System.Collections.Generic.List<Member> GetXMLMember(this Assembly assembly)
 		{
 			//先从缓存读取 如果缓存里没有则查找文件
-			if (AssemblyXmlCache.ContainsKey(assembly))
+			if (AssemblyXmlCache.TryGetValue(assembly, out System.Collections.Generic.List<Member>? value))
 			{
-				return AssemblyXmlCache[assembly];
+				return value;
 			}
 			else
 			{

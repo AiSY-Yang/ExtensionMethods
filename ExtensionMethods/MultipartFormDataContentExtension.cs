@@ -79,7 +79,7 @@ namespace ExtensionMethods
 							content.Add(new ByteArrayContent(buffer), key, tuple.Item2);
 							break;
 						default:
-							content.Add(new StringContent(item.GetValue(data)?.ToString()), key);
+							content.Add(new StringContent(item.GetValue(data)?.ToString() ?? ""), key);
 							break;
 					}
 				}

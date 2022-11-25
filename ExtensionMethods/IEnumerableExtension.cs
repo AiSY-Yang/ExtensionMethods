@@ -30,7 +30,11 @@ namespace ExtensionMethods
 			System.Collections.Generic.IEnumerable<TInner> inner,
 			System.Func<TOuter, TKey> outerKeySelector,
 			System.Func<TInner, TKey> innerKeySelector,
+#if NET5_0_OR_GREATER
+			System.Func<TOuter, TInner?, TResult> resultSelector)
+#else
 			System.Func<TOuter, TInner, TResult> resultSelector)
+#endif
 			=> outer.GroupJoin(inner, outerKeySelector, innerKeySelector, (x, y) => new { x, y }).SelectMany(a => a.y.DefaultIfEmpty(), (a, b) => resultSelector(a.x, b));
 		/// <summary>
 		/// 分页 页码&lt;=0时返回第一页 页尺寸&lt;=0时不进行分页

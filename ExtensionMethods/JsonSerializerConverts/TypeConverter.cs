@@ -25,9 +25,8 @@ namespace ExtensionMethods.JsonSerializerConverts
 		/// <inheritdoc/>
 		public override void Write(Utf8JsonWriter writer, Type value, JsonSerializerOptions options)
 		{
-			string assemblyQualifiedName = value?.AssemblyQualifiedName;
 			// Use this with caution, since you are disclosing type information.
-			writer.WriteStringValue(assemblyQualifiedName);
+			writer.WriteStringValue(value.AssemblyQualifiedName);
 		}
 	}
 }

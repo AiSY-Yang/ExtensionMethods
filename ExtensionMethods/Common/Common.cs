@@ -65,8 +65,8 @@ namespace ExtensionMethods.Common
 		public static string GetMIME(string Name)
 		{
 			var extensionName = System.IO.Path.GetExtension(Name);
-			extensionName = extensionName == "" ? Name : extensionName.Remove(0, 1);
-			return MIME.ContainsKey(extensionName) ? MIME[extensionName] : "application/octet-stream";
+			extensionName = extensionName.IsNullOrWhiteSpace() ? Name.StartsWith('.') ? Name[1..] : Name : extensionName[1..];
+			return MIME.TryGetValue(extensionName, out string? value) ? value : "application/octet-stream";
 		}
 
 		private static readonly System.Collections.Generic.Dictionary<string, string> MIME = new System.Collections.Generic.Dictionary<string, string>
