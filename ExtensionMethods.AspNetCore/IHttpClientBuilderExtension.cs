@@ -74,7 +74,7 @@ namespace ExtensionMethods
 						scope.Add("response_body", await response.Content.ReadAsStringAsync());
 #endif
 					}
-
+					scope.Add("status_code", response.StatusCode);
 					// We run the ShouldLog function that calculates, based on HttpResponseMessage, if we should log HttpClient request/response.
 					logPayloads = logPayloads || shouldLog(response);
 					return response;
