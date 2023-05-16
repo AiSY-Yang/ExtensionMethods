@@ -59,39 +59,5 @@ namespace ExtensionMethods
 		public static bool Belong<TSource>(this System.Collections.Generic.IEnumerable<TSource> smallSet,
 			System.Collections.Generic.IEnumerable<TSource> bigSet,
 			bool canEqual = true) => smallSet.All(x => bigSet.Contains(x)) && (canEqual || bigSet.Any(x => !smallSet.Contains(x)));
-
-		/// <summary>
-		/// 两个IEnumerable对象内的成员相同(包括顺序与值)
-		/// </summary>
-		/// <param name="obj1"></param>
-		/// <param name="obj"></param>
-		/// <returns></returns>
-		public static bool ContentEquals(this System.Collections.IEnumerable obj1, System.Collections.IEnumerable obj)
-		{
-			var x = obj1.GetEnumerator();
-			var y = obj.GetEnumerator();
-			while (true)
-			{
-				bool hasNextX = x.MoveNext();
-				bool hasNextY = y.MoveNext();
-				if (!hasNextX || !hasNextY)
-					return hasNextX == hasNextY;
-#if NETCOREAPP3_1
-				if (x.Current == null || y.Current == null)
-				{
-					throw new ArgumentNullException();
-				}
-#endif
-				System.Type typeX = x.Current.GetType();
-				System.Type typeY = y.Current.GetType();
-				if (!typeX.Equals(typeY))
-					return false;
-				if (typeX is System.Collections.IEnumerable xx && typeY is System.Collections.IEnumerable yy)
-					if (!ContentEquals(xx, yy))
-						return false;
-				if (!x.Current.Equals(y.Current))
-					return false;
-			}
-		}
 	}
 }

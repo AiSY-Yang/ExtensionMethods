@@ -105,18 +105,16 @@ namespace ExtensionMethods
 						client.DefaultRequestHeaders.Range = new System.Net.Http.Headers.RangeHeaderValue(startPosition, null);
 					res = await client.GetAsync(url);
 
-					using (Stream readStream = await res.Content.ReadAsStreamAsync())
+					using Stream readStream = await res.Content.ReadAsStreamAsync();
+					byte[] btArray = new byte[ByteSize];
+					long currPostion = startPosition;
+					int contentSize = 0;
+					while ((contentSize = readStream.Read(btArray, 0, btArray.Length)) > 0)
 					{
-						byte[] btArray = new byte[ByteSize];
-						long currPostion = startPosition;
-						int contentSize = 0;
-						while ((contentSize = readStream.Read(btArray, 0, btArray.Length)) > 0)
-						{
-							writeStream.Write(btArray, 0, contentSize);
-							currPostion += contentSize;
+						writeStream.Write(btArray, 0, contentSize);
+						currPostion += contentSize;
 
-							ShowDownloadPercent?.Invoke((int)(currPostion * 100 / remoteFileLength));
-						}
+						ShowDownloadPercent?.Invoke((int)(currPostion * 100 / remoteFileLength));
 					}
 					return true;
 				}

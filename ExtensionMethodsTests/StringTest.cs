@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 using Xunit;
 
@@ -285,6 +286,8 @@ namespace ExtensionMethodsTests
 			Assert.Equal(1.1F, "1.1".Convert<float>());
 			Assert.Equal(1.1D, "1.1".Convert<double>());
 			Assert.Equal(DateTime.Parse("2006-01-01 00:00:00"), "2006-01-01 00:00:00".Convert<DateTime>());
+			Assert.Equal(1, "1".Convert<int?>());
+			Assert.Null("".Convert<int?>());
 			Assert.Equal(new Obj(), new Obj().ToJson().Convert<Obj>());
 		}
 		#endregion
@@ -318,7 +321,7 @@ namespace ExtensionMethodsTests
 			Obj o = obj as Obj;
 			return N == o.N
 				&& S == o.S
-				&& (Array == null || Array.ContentEquals(o.Array));
+				&& (Array == null || Array.SequenceEqual(o.Array));
 		}
 
 		public override int GetHashCode()

@@ -44,9 +44,7 @@ namespace ExtensionMethods
 		{
 			if (string.IsNullOrEmpty(sortField))
 				throw new ArgumentException("排序字段为空!");
-			PropertyInfo? sortProperty = typeof(T).GetProperty(sortField, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-			if (sortProperty == null)
-				throw new ArgumentException($"查询对象中不存在排序字段{ sortField }！");
+			PropertyInfo sortProperty = typeof(T).GetProperty(sortField, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase) ?? throw new ArgumentException($"查询对象中不存在排序字段{sortField}！");
 			ParameterExpression param = Expression.Parameter(typeof(T));
 			var body = Expression.MakeMemberAccess(param, sortProperty);
 			LambdaExpression keySelectorLambda = Expression.Lambda(body, param);
@@ -65,9 +63,7 @@ namespace ExtensionMethods
 		{
 			if (string.IsNullOrEmpty(sortField))
 				throw new ArgumentException("排序字段为空!");
-			PropertyInfo? sortProperty = typeof(T).GetProperty(sortField, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-			if (sortProperty == null)
-				throw new ArgumentException($"查询对象中不存在排序字段{ sortField }！");
+			PropertyInfo sortProperty = typeof(T).GetProperty(sortField, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase) ?? throw new ArgumentException($"查询对象中不存在排序字段{sortField}！");
 			ParameterExpression param = Expression.Parameter(typeof(T));
 			var body = Expression.MakeMemberAccess(param, sortProperty);
 			LambdaExpression keySelectorLambda = Expression.Lambda(body, param);

@@ -405,19 +405,12 @@ namespace ExtensionMethods
 			var converter = System.ComponentModel.TypeDescriptor.GetConverter(typeof(T));
 			try
 			{
-				try
-				{
-					var res = converter.ConvertFromString(str);
-					if (res == null)
-					{
-						throw new Exception();
-					}
-					return (T)res;
-				}
-				catch (Exception)
-				{
-					return str.AsJsonToObject<T>();
-				}
+				var res = converter.ConvertFromString(str);
+				return (T)res!;
+			}
+			catch (NotSupportedException)
+			{
+				return str.AsJsonToObject<T>();
 			}
 			catch (Exception)
 			{

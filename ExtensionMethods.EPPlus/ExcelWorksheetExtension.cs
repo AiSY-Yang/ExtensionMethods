@@ -1,4 +1,7 @@
 ﻿using System.Data;
+using System.Linq;
+
+using OfficeOpenXml;
 
 namespace ExtensionMethods.EPPlus
 {
@@ -59,6 +62,16 @@ namespace ExtensionMethods.EPPlus
 			{
 				item.AutoFit();
 			}
+		}
+		/// <summary>
+		/// 获取表头
+		/// </summary>
+		/// <param name="sheet"></param>
+		/// <returns></returns>
+		public static string[] GetHeaderColumns(this ExcelWorksheet sheet)
+		{
+			return sheet.Cells[sheet.Dimension.Start.Row, sheet.Dimension.Start.Column, 1, sheet.Dimension.End.Column]
+				.Select(firstRowCell => firstRowCell.Text).ToArray();
 		}
 	}
 }
