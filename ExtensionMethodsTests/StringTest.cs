@@ -261,6 +261,7 @@ namespace ExtensionMethodsTests
 		[InlineData("abbCddEff")]
 		[InlineData("abb-Cdd-Eff")]
 		[InlineData("abb-Cdd_Eff")]
+		[InlineData("abb.Cdd.Eff")]
 		public void ToNamingConvention(string identifier)
 		{
 			Assert.Throws<InvalidEnumArgumentException>(() => identifier.ToNamingConvention(0));
@@ -275,6 +276,46 @@ namespace ExtensionMethodsTests
 			Assert.Equal("abb-cdd-eff", identifier.ToNamingConvention(NamingConvention.kebab一case));
 			Assert.Equal("ABB-CDD-EFF", identifier.ToNamingConvention(NamingConvention.TRAIN一CASE));
 			Assert.Equal("Abb-Cdd-Eff", identifier.ToNamingConvention(NamingConvention.Train一Case));
+		}
+		[Theory]
+		[InlineData("QQNumber")]
+		[InlineData("QQ-Number")]
+		[InlineData("QQ-number")]
+		[InlineData("QQ.number")]
+		public void ToNamingConvention2(string identifier)
+		{
+			Assert.Throws<InvalidEnumArgumentException>(() => identifier.ToNamingConvention(0));
+			Assert.Equal("qqnumber", identifier.ToNamingConvention(NamingConvention.flatcase));
+			Assert.Equal("QQNUMBER", identifier.ToNamingConvention(NamingConvention.UPPERCASE));
+			Assert.Equal("qqNumber", identifier.ToNamingConvention(NamingConvention.camelCase));
+			Assert.Equal("QQNumber", identifier.ToNamingConvention(NamingConvention.PascalCase));
+			Assert.Equal("qq_number", identifier.ToNamingConvention(NamingConvention.snake_case));
+			Assert.Equal("qq_Number", identifier.ToNamingConvention(NamingConvention.camel_Snake_Case));
+			Assert.Equal("QQ_NUMBER", identifier.ToNamingConvention(NamingConvention.MACRO_CASE));
+			Assert.Equal("QQ_Number", identifier.ToNamingConvention(NamingConvention.Pascal_Snake_Case));
+			Assert.Equal("qq-number", identifier.ToNamingConvention(NamingConvention.kebab一case));
+			Assert.Equal("QQ-NUMBER", identifier.ToNamingConvention(NamingConvention.TRAIN一CASE));
+			Assert.Equal("QQ-Number", identifier.ToNamingConvention(NamingConvention.Train一Case));
+		}
+		[Theory]
+		[InlineData("XMLTags")]
+		[InlineData("XML-Tags")]
+		[InlineData("XML-tags")]
+		[InlineData("XML.tags")]
+		public void ToNamingConvention3(string identifier)
+		{
+			Assert.Throws<InvalidEnumArgumentException>(() => identifier.ToNamingConvention(0));
+			Assert.Equal("xmltags", identifier.ToNamingConvention(NamingConvention.flatcase));
+			Assert.Equal("XMLTAGS", identifier.ToNamingConvention(NamingConvention.UPPERCASE));
+			Assert.Equal("xmlTags", identifier.ToNamingConvention(NamingConvention.camelCase));
+			Assert.Equal("XmlTags", identifier.ToNamingConvention(NamingConvention.PascalCase));
+			Assert.Equal("xml_tags", identifier.ToNamingConvention(NamingConvention.snake_case));
+			Assert.Equal("xml_Tags", identifier.ToNamingConvention(NamingConvention.camel_Snake_Case));
+			Assert.Equal("XML_TAGS", identifier.ToNamingConvention(NamingConvention.MACRO_CASE));
+			Assert.Equal("Xml_Tags", identifier.ToNamingConvention(NamingConvention.Pascal_Snake_Case));
+			Assert.Equal("xml-tags", identifier.ToNamingConvention(NamingConvention.kebab一case));
+			Assert.Equal("XML-TAGS", identifier.ToNamingConvention(NamingConvention.TRAIN一CASE));
+			Assert.Equal("Xml-Tags", identifier.ToNamingConvention(NamingConvention.Train一Case));
 		}
 
 		[Fact]

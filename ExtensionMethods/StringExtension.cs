@@ -437,6 +437,7 @@ namespace ExtensionMethods
 		}
 		/// <summary>
 		/// 转换到指定的命名方式
+		/// <br/><a href="https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions"/>
 		/// </summary>
 		/// <param name="identifier"></param>
 		/// <param name="namingConvention"></param>
@@ -447,19 +448,21 @@ namespace ExtensionMethods
 			int wordCount = 0;
 			return namingConvention switch
 			{
-				NamingConvention.flatcase => identifier.Replace("-", "").Replace("_", "").ToLower(),
-				NamingConvention.UPPERCASE => identifier.Replace("-", "").Replace("_", "").ToUpper(),
+				NamingConvention.flatcase => identifier.Replace("-", "").Replace("_", "").Replace(".", "").ToLower(),
+				NamingConvention.UPPERCASE => identifier.Replace("-", "").Replace("_", "").Replace(".", "").ToUpper(),
 				NamingConvention.camelCase => string.Concat(SplitWord(identifier).Select(x => { return wordCount++ == 0 ? x.ToLower() : string.Concat(char.ToUpper(x[0]), x[1..].ToLower()); })),
-				NamingConvention.PascalCase => string.Concat(SplitWord(identifier).Select(x => string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
+				NamingConvention.PascalCase => string.Concat(SplitWord(identifier).Select(x => ToPascalCase(x))),
 				NamingConvention.snake_case => string.Join('_', SplitWord(identifier).Select(x => x.ToLower())),
 				NamingConvention.camel_Snake_Case => string.Join('_', SplitWord(identifier).Select(x => { return wordCount++ == 0 ? x.ToLower() : string.Concat(char.ToUpper(x[0]), x[1..].ToLower()); })),
 				NamingConvention.MACRO_CASE => string.Join('_', SplitWord(identifier).Select(x => x.ToUpper())),
-				NamingConvention.Pascal_Snake_Case => string.Join('_', SplitWord(identifier).Select(x => string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
+				NamingConvention.Pascal_Snake_Case => string.Join('_', SplitWord(identifier).Select(x => x.Length <= 2 && x.All(x => char.IsUpper(x)) ? x : string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
 				NamingConvention.kebab一case => string.Join('-', SplitWord(identifier).Select(x => x.ToLower())),
 				NamingConvention.TRAIN一CASE => string.Join('-', SplitWord(identifier).Select(x => x.ToUpper())),
-				NamingConvention.Train一Case => string.Join('-', SplitWord(identifier).Select(x => string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
+				NamingConvention.Train一Case => string.Join('-', SplitWord(identifier).Select(x => x.Length <= 2 && x.All(x => char.IsUpper(x)) ? x : string.Concat(char.ToUpper(x[0]), x[1..].ToLower()))),
 				_ => throw new InvalidEnumArgumentException(nameof(NamingConvention)),
 			};
+			//转换为首字母大写
+			string ToPascalCase(string identifier) => identifier.Length <= 2 && identifier.All(x => char.IsUpper(x)) ? identifier : string.Concat(char.ToUpper(identifier[0]), identifier[1..].ToLower());
 			//分割标识符单词
 			List<string> SplitWord(string identifier)
 			{
@@ -467,30 +470,35 @@ namespace ExtensionMethods
 				var charList = new char[identifier.Length * 2];
 				for (int i = 0, j = 0; i < identifier.Length; i++, j++)
 				{
-					if (char.IsUpper(identifier[i]))
-					{
-						if (!lastIsUpper)
+					if (!(identifier[i] == '-') && !(identifier[i] == '_') && !(identifier[i] == '.'))
+						if (char.IsUpper(identifier[i]))
 						{
-							charList[j] = '-';
-							j++;
-							lastIsUpper = true;
+							if (!lastIsUpper)
+							{
+								charList[j] = '-';
+								j++;
+								lastIsUpper = true;
+							}
 						}
-					}
-					else
-					{
-						lastIsUpper = false;
-					}
+						else
+						{
+							if (j > 2
+								&& char.IsUpper(charList.Take(j).Reverse().Where(x => x != '-' && x != '_' && x != '.').Skip(0).FirstOrDefault())
+								&& char.IsUpper(charList.Take(j).Reverse().Where(x => x != '-' && x != '_' && x != '.').Skip(1).FirstOrDefault()))
+							{
+								charList[j] = charList[j - 1];
+								charList[j - 1] = '-';
+								j++;
+							}
+							lastIsUpper = false;
+							charList[j] = identifier[i];
+						}
 
 					charList[j] = identifier[i];
 				}
-				var wordList = new List<string>();
-				var l = string.Concat(charList).TrimEnd('\0')
-					.Split(new char[] { '-', '_' }, StringSplitOptions.RemoveEmptyEntries);
-				for (int i = 0; i < l.Length; i++)
-				{
-					wordList.Add(l[i]);
-				}
-				return wordList;
+				return string.Concat(charList).TrimEnd('\0')
+					.Split(new char[] { '-', '_', '.' }, StringSplitOptions.RemoveEmptyEntries)
+					.ToList();
 			}
 		}
 		#endregion
