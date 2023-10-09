@@ -1,18 +1,9 @@
-﻿using ExtensionMethods;
-
-using Moq;
-
-using MySqlX.XDevAPI.Relational;
-
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Data.SqlClient;
-using System.Linq;
+
+using ExtensionMethods;
 
 using Xunit;
-using Xunit.Sdk;
 
 namespace ExtensionMethodsTests
 {
@@ -21,11 +12,12 @@ namespace ExtensionMethodsTests
 		public IDbConnectionTest()
 		{
 			SqlConnectionFactory.Init();
+			SQLitePCL.Batteries.Init();
 		}
 		public static class SqlConnectionFactory
 		{
 			public static List<IDbConnection> ConnectionList => new List<IDbConnection>() {
-				new MySql.Data.MySqlClient.MySqlConnection("Server=localhost;Database=UnitTest;user=root;password=123456"),
+				new Microsoft.Data.Sqlite.SqliteConnection("Data Source=test.db"),
 			};
 			public static void Init()
 			{
@@ -46,7 +38,6 @@ union all
 SELECT 1,2,2
 union all 
 SELECT 1,2,3;
-commit;
 ");
 				}
 			}

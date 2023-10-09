@@ -126,5 +126,86 @@ namespace ExtensionMethods
 		/// <param name="expression">查询表达式</param>
 		/// <returns></returns>
 		public static IQueryable<TSource> Where<TSource>(this IQueryable<TSource> sources, bool condition, System.Linq.Expressions.Expression<Func<TSource, bool>> expression) => condition ? sources.Where(expression) : sources;
+
+		/// <summary>
+		/// 按照Or条件组合多个表达式
+		/// </summary>
+		/// <typeparam name="TSource"></typeparam>
+		/// <param name="query"></param>
+		/// <param name="conditions"></param>
+		/// <returns></returns>
+		public static IQueryable<TSource> WhereOr<TSource>(this IQueryable<TSource> query, IEnumerable<Expression<Func<TSource, bool>>> conditions)
+		{
+#if NET6_0_OR_GREATER
+			var count = conditions.TryGetNonEnumeratedCount(out var c) ? c : conditions.Count();
+#else
+			var count = conditions.Count();
+#endif
+			switch (count)
+			{
+				case 0:
+					return query;
+				case 1:
+					return query.Where(conditions.First());
+				default:
+					Expression<Func<TSource, bool>> expression = (TSource u) => false;
+					foreach (var item in conditions)
+					{
+						var parameterExpressionSetter = expression.Parameters
+			.Select((u, i) => new { u, Parameter = item.Parameters[i] })
+			.ToDictionary(d => d.Parameter, d => d.u);
+						var extendExpressionBody = new ParameterReplaceExpressionVisitor(parameterExpressionSetter).Visit(item.Body);
+						expression = Expression.Lambda<Func<TSource, bool>>(Expression.OrElse(expression.Body, extendExpressionBody), expression.Parameters);
+					}
+					return query.Where(expression);
+			}
+		}
 	}
+
+	/// <summary>
+	/// 处理 Lambda 参数不一致问题
+	/// </summary>
+	internal sealed class ParameterReplaceExpressionVisitor : System.Linq.Expressions.ExpressionVisitor
+	{
+		/// <summary>
+		/// 参数表达式映射集合
+		/// </summary>
+		private readonly Dictionary<ParameterExpression, ParameterExpression> parameterExpressionSetter;
+
+		/// <summary>
+		/// 构造函数
+		/// </summary>
+		/// <param name="parameterExpressionSetter">参数表达式映射集合</param>
+		public ParameterReplaceExpressionVisitor(Dictionary<ParameterExpression, ParameterExpression> parameterExpressionSetter)
+		{
+			this.parameterExpressionSetter = parameterExpressionSetter ?? new Dictionary<ParameterExpression, ParameterExpression>();
+		}
+
+		/// <summary>
+		/// 替换表达式参数
+		/// </summary>
+		/// <param name="parameterExpressionSetter">参数表达式映射集合</param>
+		/// <param name="expression">表达式</param>
+		/// <returns>新的表达式</returns>
+		public static Expression ReplaceParameters(Dictionary<ParameterExpression, ParameterExpression> parameterExpressionSetter, Expression expression)
+		{
+			return new ParameterReplaceExpressionVisitor(parameterExpressionSetter).Visit(expression);
+		}
+
+		/// <summary>
+		/// 重写基类参数访问器
+		/// </summary>
+		/// <param name="parameterExpression"></param>
+		/// <returns></returns>
+		protected override Expression VisitParameter(ParameterExpression parameterExpression)
+		{
+			if (parameterExpressionSetter.TryGetValue(parameterExpression, out var replacement))
+			{
+				parameterExpression = replacement;
+			}
+
+			return base.VisitParameter(parameterExpression);
+		}
+	}
+
 }

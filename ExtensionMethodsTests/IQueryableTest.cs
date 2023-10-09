@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 using Xunit;
 
@@ -100,6 +101,18 @@ namespace ExtensionMethodsTests
 			Assert.Equal(2, result.Count);
 			Assert.Equal(2, result.First());
 			Assert.Equal(4, result.Last());
+			result = listForWhere.Where(false, x => x % 2 == 0).ToList();
+			Assert.Equal(5, result.Count);
+			Assert.Equal(2, result.First());
+			Assert.Equal(5, result.Last());
+		}
+		[Fact]
+		public void WhereOr()
+		{
+			var expression = new List<Expression<Func<int, bool>>>();
+			var result = listForWhere.WhereOr(expression).ToList();
+			Assert.True(result.SequenceEqual(listForWhere));
+			expression.Add(x => x == 2);
 			result = listForWhere.Where(false, x => x % 2 == 0).ToList();
 			Assert.Equal(5, result.Count);
 			Assert.Equal(2, result.First());

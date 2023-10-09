@@ -5,6 +5,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
+using LinqKit;
+
 namespace ExtensionMethods
 {
 	/// <summary>
@@ -436,6 +438,10 @@ namespace ExtensionMethods
 			return ms;
 		}
 		/// <summary>
+		/// 无效的符号
+		/// </summary>
+		static readonly char[] InvalidChars = new[] { '-', '_', '.', ',', ' ' };
+		/// <summary>
 		/// 转换到指定的命名方式
 		/// <br/><a href="https://learn.microsoft.com/en-us/dotnet/standard/design-guidelines/capitalization-conventions"/>
 		/// </summary>
@@ -448,8 +454,8 @@ namespace ExtensionMethods
 			int wordCount = 0;
 			return namingConvention switch
 			{
-				NamingConvention.flatcase => identifier.Replace("-", "").Replace("_", "").Replace(".", "").ToLower(),
-				NamingConvention.UPPERCASE => identifier.Replace("-", "").Replace("_", "").Replace(".", "").ToUpper(),
+				NamingConvention.flatcase => new string(identifier.Where(x => !InvalidChars.Contains(x)).Select(x => char.ToLower(x)).ToArray()),
+				NamingConvention.UPPERCASE => new string(identifier.Where(x => !InvalidChars.Contains(x)).Select(x => char.ToUpper(x)).ToArray()),
 				NamingConvention.camelCase => string.Concat(SplitWord(identifier).Select(x => { return wordCount++ == 0 ? x.ToLower() : string.Concat(char.ToUpper(x[0]), x[1..].ToLower()); })),
 				NamingConvention.PascalCase => string.Concat(SplitWord(identifier).Select(x => ToPascalCase(x))),
 				NamingConvention.snake_case => string.Join('_', SplitWord(identifier).Select(x => x.ToLower())),
@@ -462,7 +468,9 @@ namespace ExtensionMethods
 				_ => throw new InvalidEnumArgumentException(nameof(NamingConvention)),
 			};
 			//转换为首字母大写
-			string ToPascalCase(string identifier) => identifier.Length <= 2 && identifier.All(x => char.IsUpper(x)) ? identifier : string.Concat(char.ToUpper(identifier[0]), identifier[1..].ToLower());
+			string ToPascalCase(string identifier) => identifier.Length == 1
+				? identifier.ToUpper() : identifier.Length <= 2 && identifier.All(x => char.IsUpper(x))
+					? identifier : string.Concat(char.ToUpper(identifier[0]), identifier[1..].ToLower());
 			//分割标识符单词
 			List<string> SplitWord(string identifier)
 			{
@@ -470,7 +478,7 @@ namespace ExtensionMethods
 				var charList = new char[identifier.Length * 2];
 				for (int i = 0, j = 0; i < identifier.Length; i++, j++)
 				{
-					if (!(identifier[i] == '-') && !(identifier[i] == '_') && !(identifier[i] == '.'))
+					if (!InvalidChars.Contains(identifier[i]))
 						if (char.IsUpper(identifier[i]))
 						{
 							if (!lastIsUpper)
@@ -497,7 +505,7 @@ namespace ExtensionMethods
 					charList[j] = identifier[i];
 				}
 				return string.Concat(charList).TrimEnd('\0')
-					.Split(new char[] { '-', '_', '.' }, StringSplitOptions.RemoveEmptyEntries)
+					.Split(InvalidChars, StringSplitOptions.RemoveEmptyEntries)
 					.ToList();
 			}
 		}

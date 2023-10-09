@@ -262,6 +262,7 @@ namespace ExtensionMethodsTests
 		[InlineData("abb-Cdd-Eff")]
 		[InlineData("abb-Cdd_Eff")]
 		[InlineData("abb.Cdd.Eff")]
+		[InlineData("abb Cdd Eff")]
 		public void ToNamingConvention(string identifier)
 		{
 			Assert.Throws<InvalidEnumArgumentException>(() => identifier.ToNamingConvention(0));
@@ -282,6 +283,8 @@ namespace ExtensionMethodsTests
 		[InlineData("QQ-Number")]
 		[InlineData("QQ-number")]
 		[InlineData("QQ.number")]
+		[InlineData("QQ number")]
+		[InlineData("QQ,number")]
 		public void ToNamingConvention2(string identifier)
 		{
 			Assert.Throws<InvalidEnumArgumentException>(() => identifier.ToNamingConvention(0));
@@ -302,6 +305,7 @@ namespace ExtensionMethodsTests
 		[InlineData("XML-Tags")]
 		[InlineData("XML-tags")]
 		[InlineData("XML.tags")]
+		[InlineData("XML,tags")]
 		public void ToNamingConvention3(string identifier)
 		{
 			Assert.Throws<InvalidEnumArgumentException>(() => identifier.ToNamingConvention(0));

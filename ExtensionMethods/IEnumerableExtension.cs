@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace ExtensionMethods
 {
@@ -59,5 +61,43 @@ namespace ExtensionMethods
 		public static bool Belong<TSource>(this System.Collections.Generic.IEnumerable<TSource> smallSet,
 			System.Collections.Generic.IEnumerable<TSource> bigSet,
 			bool canEqual = true) => smallSet.All(x => bigSet.Contains(x)) && (canEqual || bigSet.Any(x => !smallSet.Contains(x)));
+#if NET7_0_OR_GREATER
+		/// <summary>
+		/// 取中位数 如果数量为偶数则为中间两个数的平均
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		/// <exception cref="NotSupportedException"></exception>
+		public static double Median<T>(this IEnumerable<T> source) where T : System.Numerics.INumber<T>, IConvertible
+		{
+			var count = source.TryGetNonEnumeratedCount(out int c) ? c : source.Count();
+			if (count == 0) return 0;
+			if (count == 1) return Convert.ToDouble(source.First());
+			var order = source.Order();
+			return (count % 2) switch
+			{
+				0 => (Convert.ToDouble(order.Skip(count / 2 - 1).Take(2).First()) + Convert.ToDouble(order.Skip(count / 2).Take(2).First())) / 2,
+				1 => Convert.ToDouble(order.Skip(count / 2).Take(1).First()),
+				_ => throw new NotSupportedException()
+			};
+		}
+		/// <summary>
+		/// 取众数
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="source"></param>
+		/// <returns></returns>
+		/// <exception cref="InvalidOperationException"></exception>
+		public static List<T> Mode<T>(this IEnumerable<T> source) where T : INumber<T>
+		{
+			var count = source.TryGetNonEnumeratedCount(out int c) ? c : source.Count();
+			if (count == 0) throw new InvalidOperationException("序列不包含任何元素");
+			if (count == 1) return new List<T> { source.First() };
+			var groups = source.GroupBy(x => x).Select(x => new { key = x.Key, count = x.Count() });
+			var maxCount = groups.Max(x => x.count);
+			return groups.Where(x => x.count == maxCount).Select(x => x.key).ToList();
+		}
+#endif
 	}
 }

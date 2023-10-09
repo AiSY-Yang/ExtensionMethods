@@ -12,7 +12,7 @@ namespace ExtensionMethods
 		/// <summary>
 		/// 程序集XML信息缓存
 		/// </summary>
-		public static System.Collections.Generic.Dictionary<Assembly, System.Collections.Generic.List<Member>> AssemblyXmlCache { get; } = new System.Collections.Generic.Dictionary<Assembly, System.Collections.Generic.List<Member>>();
+		public static System.Collections.Generic.concud<Assembly, System.Collections.Generic.List<Member>> AssemblyXmlCache { get; } = new System.Collections.Generic.Dictionary<Assembly, System.Collections.Generic.List<Member>>();
 
 		/// <summary>
 		/// 获取程序集的xml信息 要求xml文件与程序集在同一目录下且只有文件扩展名不一样 如果未找到文件则返回空列表

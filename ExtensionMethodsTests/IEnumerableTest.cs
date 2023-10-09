@@ -1,5 +1,7 @@
 ﻿using ExtensionMethods;
 
+using MoreLinq;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,5 +144,27 @@ namespace ExtensionMethodsTests
 			Assert.True(small.Belong(small));
 			Assert.False(small.Belong(small, false));
 		}
+#if NET7_0_OR_GREATER
+		[Fact]
+		public void Median()
+		{
+			Assert.Equal(1, new[] { 1 }.Shuffle().Median());
+			Assert.Equal(1.5, new[] { 1, 2 }.Shuffle().Median());
+			Assert.Equal(2, new[] { 1, 2, 3 }.Shuffle().Median());
+			Assert.Equal(2.5, new[] { 1, 2, 3, 4 }.Shuffle().Median());
+			Assert.Equal(1.1, new[] { 1.1 }.Shuffle().Median());
+			Assert.Equal(1.15, new[] { 1.1, 1.2 }.Shuffle().Median());
+			Assert.Equal(1.2, new[] { 1.1, 1.2, 1.3 }.Shuffle().Median());
+			Assert.Equal(1.25, new[] { 1.1, 1.2, 1.3, 1.4 }.Shuffle().Median());
+		}
+		[Fact]
+		public void Mode()
+		{
+			Assert.Throws<InvalidOperationException>(() => Array.Empty<int>().Mode());
+			Assert.Equal(new[] { 1 }.Order(), new[] { 1 }.Shuffle().Mode().Order());
+			Assert.Equal(new[] { 1, 2 }.Order(), new[] { 1, 2 }.Shuffle().Mode().Order());
+			Assert.Equal(new[] { 2 }.Order(), new[] { 1, 2, 2 }.Shuffle().Mode().Order());
+		}
+#endif
 	}
 }
