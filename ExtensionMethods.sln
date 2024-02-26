@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29519.87
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtensionMethods", "ExtensionMethods\ExtensionMethods.csproj", "{48A8FE65-E94D-495D-8FD6-C5D68BC2BD89}"
 EndProject
@@ -16,6 +16,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		README.MD = README.MD
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtensionMethods.EntityFrameworkCore", "ExtensionMethods.EntityFrameworkCore\ExtensionMethods.EntityFrameworkCore.csproj", "{794F07B6-4ACF-46B8-BD63-FAE73FF04C69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{C26A230D-8A2A-4C07-847E-F299BC17F0FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C26A230D-8A2A-4C07-847E-F299BC17F0FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C26A230D-8A2A-4C07-847E-F299BC17F0FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{794F07B6-4ACF-46B8-BD63-FAE73FF04C69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{794F07B6-4ACF-46B8-BD63-FAE73FF04C69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{794F07B6-4ACF-46B8-BD63-FAE73FF04C69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{794F07B6-4ACF-46B8-BD63-FAE73FF04C69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
